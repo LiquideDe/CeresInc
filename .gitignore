@@ -61,3 +61,12 @@ crashlytics-build.properties
 # Blend files, because they are too fat
 *.blend
 *.blend1
+*.meta
+
+*.fbx
+*.prefab
+*.db
+[Aa]ssets/SaveGames*
+*.png
+*.mat
+*.tga
