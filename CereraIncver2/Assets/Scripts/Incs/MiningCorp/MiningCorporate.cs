@@ -221,9 +221,10 @@ public class MiningCorporate : Corporate, ICorporateShare
                 BuildNewShip(0);
                 BuildNewShip(1);
             }
+            
             if(FreeWorkers - PlannedWorkerForWork > 10)
             {
-                Debug.Log($"Поступила свежая кровь");
+                Debug.Log($"Поступила свежая кровь в {CorpName}, всего рабочих {FreeWorkers}, ждут распределения {PlannedWorkerForWork}");
                 MiningDepartment.FindNearestAsteroid();
             }
             ShipDepartment.ShipWorking();        

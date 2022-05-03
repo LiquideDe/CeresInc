@@ -131,11 +131,13 @@ public class ShipForSimulation
                 {
                     Workers += destinations[i].WorkersPlanned - destinations[i].WorkersOnStation;                    
                     Corporate.FreeWorkers -= destinations[i].WorkersPlanned - destinations[i].WorkersOnStation;
+                    Corporate.PlannedWorkerForWork -= destinations[i].WorkersPlanned - destinations[i].WorkersOnStation;
                 }
                 else if (destinations[i].WorkersPlanned - destinations[i].WorkersOnStation > 0)
                 {
                     Workers += Corporate.FreeWorkers;
                     Corporate.FreeWorkers = 0;
+                    Corporate.PlannedWorkerForWork = 0;
                 }
 
                 if (Corporate.Food >= destinations[i].FoodPlanned)
@@ -202,6 +204,7 @@ public class ShipForSimulation
         Equipment -= destinations[0].EquipmentPlanned;
         destinations[0].FoodPlanned = 0;
         destinations[0].EquipmentPlanned = 0;
+        Debug.Log($"Разргрузили рабочих и припасы на астероид {destinations[0].AsterName}, на астероиде теперь работает {destinations[0].WorkersOnStation} человек");
         destinations.RemoveAt(0);
         distances.RemoveAt(0);
         CheckLastDestination();

@@ -30,6 +30,7 @@ public class MiningDepartment
         }
         else
         {
+            distance = 10000000;
             for (int i = 0; i < Corporate.MainClass.Asteroids.AsteroidsCount(); i++)
             {
                 if (!Corporate.MainClass.Asteroids.GetSimAsteroid(i).HasMiningStation && Vector3.Distance(asteroids.Last().Position, Corporate.MainClass.Asteroids.GetSimAsteroid(i).Position) < distance 
@@ -56,7 +57,7 @@ public class MiningDepartment
     {
         asteroids.Add(asteroid);
         asteroid.HasMiningStation = true;
-        Debug.Log($"Добавляем на астероид {asteroid.AsterName} {Corporate.GetFreeWorkers(20)} рабочих, всего астероидов {asteroids.Count}");
+        Debug.Log($"Добавляем на астероид {asteroid.AsterName} {Corporate.GetFreeWorkers(20)} рабочих, всего астероидов {asteroids.Count}, осталось рабочих {Corporate.FreeWorkers - Corporate.PlannedWorkerForWork}");
         asteroid.WorkersPlanned += Corporate.GetFreeWorkers(20);
         asteroid.CalculateSupplyConsuption();
     }
