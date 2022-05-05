@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AsteroidForPlayer : Asteroid
+public class AsteroidForPlayer : Asteroid, IAsteroid
 {
     public float SizeofCircle { get; set; }
     
@@ -29,6 +29,16 @@ public class AsteroidForPlayer : Asteroid
     {
         get { return asterPanel; }
     }
+
+    public int Workers { get { return MiningStation.WorkersOnStation; } }
+    public float Food { get { return MiningStation.Food; } }
+    public float Equipment { get { return MiningStation.Equipment; } }
+    public float IncomeLastMonth { get { return MiningStation.IncomeLastMonth; } }
+    public float ExcavatedSoil { get { return MiningStation.ExcavatedSoil; } }
+    public float AmountReadyForLoading { get { return MiningStation.AmountReadyForLoading; } }
+
+    public int WorkersPlanned { get { return MiningStation.WorkersPlanned; } }
+
     public void OnAsteroid()
     {
         lod.gameObject.SetActive(true);

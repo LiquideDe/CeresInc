@@ -51,7 +51,7 @@ public class main : MonoBehaviour
     public GUI GUI { get { return gUI; } }
     public Market Market { get { return market; } }
     public WarehousePanel Warehouse { get { return warehouse; } }
-    public PanelStation Station { get { return stations; } }
+    public PanelStation PanelStation { get { return stations; } }
     public PanelOrder PanelOrder { get { return panelOrder; } }
     public ScienseForPlayer Sciense { get { return sciense; } }
     public Ceres Ceres { get { return ceres; } }
@@ -131,6 +131,7 @@ public class main : MonoBehaviour
         corporates.CreateCorporates(true);
         CreatePanels();
         dataBase.CreateDB(path);
+        PanelStation.CreateButtons();
 
         GameIsStarted = true;
     } 

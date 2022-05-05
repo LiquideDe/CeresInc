@@ -108,7 +108,7 @@ public class AsteroidPanel : MonoBehaviour, IPointerDownHandler, IBeginDragHandl
         buttonFoundColony.SetActive(false);
         ShowOwnedAsteroid();
         mainClass.Player.PlusAsteroid(asteroid);
-        panelStation.Create_Button(asteroid.Id, asteroid.AsterName);
+        //panelStation.Create_Button(asteroid.Id, asteroid.AsterName);
     }    
 
     private void ShowOwnedAsteroid()

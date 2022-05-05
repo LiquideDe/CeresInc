@@ -81,15 +81,16 @@ public class ShipDepartment
     }
     
     private void CreatePasRoute(ShipForSimulation ship)
-    {
-        float dv = (float)(ship.ISP * Math.Log((ship.Weight + ship.WeightFuel) / ship.Weight));
+    {        
         for (int i = 0; i < Corporate.MiningDepartment.CountAsteroids(); i++)
         {
+            Debug.Log($"Количество астероидов {Corporate.MiningDepartment.CountAsteroids()}");
             if(Corporate.MiningDepartment.GetAsteroid(i).WorkersOnStation != Corporate.MiningDepartment.GetAsteroid(i).WorkersPlanned)
             {
                 if(ship.CountDestination() < 3)
                 {
                     ship.AddDestination(Corporate.MiningDepartment.GetAsteroid(i));
+                    Debug.Log($"Кораблю добавлена точка {Corporate.MiningDepartment.GetAsteroid(i).AsterName}");
                 }
                     
             }

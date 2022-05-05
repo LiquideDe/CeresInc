@@ -6,6 +6,7 @@ public class MiningDepartment
 {
     public MiningCorporate Corporate { get; set; }
     private List<AsteroidForSimulation> asteroids = new List<AsteroidForSimulation>();
+    
 
     public MiningDepartment(MiningCorporate corporate)
     {
@@ -15,7 +16,7 @@ public class MiningDepartment
     public void FindNearestAsteroid()
     {
         int index = 0;
-        float distance = 10000;
+        float distance = 100000;
         if(asteroids.Count == 0)
         {
             for (int i = 0; i < Corporate.MainClass.Asteroids.AsteroidsCount(); i++)
@@ -30,7 +31,7 @@ public class MiningDepartment
         }
         else
         {
-            distance = 10000000;
+            distance = 100000000000;
             for (int i = 0; i < Corporate.MainClass.Asteroids.AsteroidsCount(); i++)
             {
                 if (!Corporate.MainClass.Asteroids.GetSimAsteroid(i).HasMiningStation && Vector3.Distance(asteroids.Last().Position, Corporate.MainClass.Asteroids.GetSimAsteroid(i).Position) < distance 
@@ -46,18 +47,17 @@ public class MiningDepartment
             }
             else
             {
+                Debug.Log($"Ќе нашли астероида");
                 DistributionWorkers();
-            }
-            
-        }
-        
+                Corporate.NoMoreAsteroids = true;
+            }            
+        }        
     }
 
     private void AddAsteroid(AsteroidForSimulation asteroid)
     {
         asteroids.Add(asteroid);
         asteroid.HasMiningStation = true;
-        Debug.Log($"ƒобавл€ем на астероид {asteroid.AsterName} {Corporate.GetFreeWorkers(20)} рабочих, всего астероидов {asteroids.Count}, осталось рабочих {Corporate.FreeWorkers - Corporate.PlannedWorkerForWork}");
         asteroid.WorkersPlanned += Corporate.GetFreeWorkers(20);
         asteroid.CalculateSupplyConsuption();
     }
@@ -86,5 +86,10 @@ public class MiningDepartment
     public void SetAsteroid(AsteroidForSimulation asteroid)
     {
         asteroids.Add(asteroid);
+    }
+
+    public List<AsteroidForSimulation> GetAllAsteroids()
+    {
+        return asteroids;
     }
 }

@@ -300,6 +300,7 @@ public class LoadGame : MonoBehaviour
 
         panelLoadGame.SetActive(false);
         mainClass.CreatePanels();
+        mainClass.PanelStation.CreateButtons();
         mainClass.GameIsStarted = true;
         mainClass.HelloPanel.SetActive(false);
         mainClass.UpdateText();        

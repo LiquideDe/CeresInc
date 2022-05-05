@@ -75,9 +75,11 @@ public class ShipForSimulation
                 }
             }
             dist += Vector3.Distance(destinations[destinations.Count - 1].Position, new Vector3(0, 0, 0));
+            
             if (dist / (dv * 86.4f / 1000) > 900)
             {
                 destinations.RemoveAt(destinations.Count - 1);
+                Debug.Log($"јстероид слишком далек, удал€ем его");
                 CalculateDestination();
             }
         }
@@ -207,6 +209,7 @@ public class ShipForSimulation
         Debug.Log($"–азргрузили рабочих и припасы на астероид {destinations[0].AsterName}, на астероиде теперь работает {destinations[0].WorkersOnStation} человек");
         destinations.RemoveAt(0);
         distances.RemoveAt(0);
+        Debug.Log($"ќсталось точек {destinations.Count}");
         CheckLastDestination();
     }
 

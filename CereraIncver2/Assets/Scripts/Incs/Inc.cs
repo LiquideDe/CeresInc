@@ -151,6 +151,11 @@ public class Inc
         return asteroids.Count;
     }
 
+    public List<AsteroidForPlayer> GetAllAsteroids()
+    {
+        return asteroids;
+    }
+
     public (float, float) EquipmentLeftFor()
     {
         float equipCons = 0;
@@ -178,4 +183,5 @@ public class Inc
 
         return (foodCons, foodDayLeft);
     }
+
 }

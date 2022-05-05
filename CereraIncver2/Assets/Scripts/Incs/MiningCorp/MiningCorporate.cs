@@ -17,6 +17,7 @@ public class MiningCorporate : Corporate, ICorporateShare
     public float PriceShare { get { return FinanceDepartment.PriceShare; } }
     public float Price { get; set; }
     public float AmountShip { get; set; }
+    public bool NoMoreAsteroids { get; set; }
 
     private List<int> carcassPas = new List<int>();
     private List<int> carcassCargo = new List<int>();
@@ -222,9 +223,8 @@ public class MiningCorporate : Corporate, ICorporateShare
                 BuildNewShip(1);
             }
             
-            if(FreeWorkers - PlannedWorkerForWork > 10)
+            if(FreeWorkers - PlannedWorkerForWork > 10 && !NoMoreAsteroids)
             {
-                Debug.Log($"Поступила свежая кровь в {CorpName}, всего рабочих {FreeWorkers}, ждут распределения {PlannedWorkerForWork}");
                 MiningDepartment.FindNearestAsteroid();
             }
             ShipDepartment.ShipWorking();        

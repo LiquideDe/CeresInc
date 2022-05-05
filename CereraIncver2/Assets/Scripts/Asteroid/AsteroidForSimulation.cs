@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AsteroidForSimulation : Asteroid
+public class AsteroidForSimulation : Asteroid, IAsteroid
 {
     public int WorkersPlanned { get; set; }
     public float ExcavatedSoil { get; set; }
@@ -19,6 +19,9 @@ public class AsteroidForSimulation : Asteroid
     public int WorkersOnStation { get; set; }
     public float IncomeLastMonth { get; set; }
     private float wellbeing;
+
+    public int Workers { get { return WorkersOnStation; } }
+    public float AmountReadyForLoading { get { return ReadyToLoad; } }
 
     public AsteroidForSimulation()
     {
