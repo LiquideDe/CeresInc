@@ -19,9 +19,8 @@ public abstract class Ship : MonoBehaviour
     public string ShipName { get; set; }
     
     protected bool isMoneyEnough;
-    public Inc OwnedInc { get; set; }
+    public Inc OwnedInc { get; set; }    
     
-    [SerializeField] private LineRenderer line;
     [SerializeField] private GameObject canvasShip;
     [SerializeField] protected PanelShip panelShip;
     [SerializeField] protected Steersman steersman;
@@ -71,10 +70,6 @@ public abstract class Ship : MonoBehaviour
         OwnedInc = inc;
         CalculatedV();
     }
-
-    public abstract void OpenDestinationPanel();
-    public abstract void CloseDestinationPanel();
-    public abstract void ChooseDestination(AsteroidForPlayer aster);
     public void CalculatedV()
     {
         Navigator.DV = (float)Math.Round(Isp * Math.Log((CalculateAllMass() + WeightFuel) / CalculateAllMass()), 0);
@@ -84,30 +79,8 @@ public abstract class Ship : MonoBehaviour
         //CalcCostJourney();
     }
     public abstract float CalculateAllMass();
-    public void DrawLines()
-    {
-        line.positionCount = 0;
-        if (Navigator.OldDestinationsCount() <= 1)
-        {
-            line.positionCount = Navigator.OldDestinationsCount() + 1;
-        }
-        else
-        {
-            line.positionCount = Navigator.OldDestinationsCount() + 2;
-        }
-        line.SetPosition(0, new Vector3(0, -172, 0));
-        for (int i = 0; i < Navigator.OldDestinationsCount(); i++)
-        {
-            line.SetPosition(i, Navigator.GetOldDestination(i).transform.position);   
-        }
-        if (Navigator.OldDestinationsCount() > 1)
-        {
-            line.loop = true;
-        }        
-        
-    }
+    
 
-    public abstract void UpdateText();
     protected bool ContainMas(AsteroidForPlayer aster)
     {
         //Содержится ли астероид в массиве
@@ -145,15 +118,9 @@ public abstract class Ship : MonoBehaviour
         {
             Navigator.StartAllowed();
             OwnedInc.Money -= CostOfJourney;
-            mainClass.UpdateText();
         }            
 
         return Navigator.IsStartAllowed;
-    }
-
-    public void StartNotAllowed()
-    {
-        Navigator.IsStartAllowed = false;
     }
 
     protected bool CalcCostJourney()
@@ -272,4 +239,6 @@ public abstract class Ship : MonoBehaviour
     }
 
     protected abstract void LoadCargo(SaveLoadShip save);
+
+    public abstract void DeterminingRequiredCargo(List<MiningStation> stations);
 }

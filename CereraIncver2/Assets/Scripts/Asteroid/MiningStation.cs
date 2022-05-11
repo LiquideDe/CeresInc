@@ -44,7 +44,7 @@ public class MiningStation : MonoBehaviour
         IncomeLastMonth = 100 * WorkersOnStation * Asteroid.ElementAbundance * wellbeing;
         IncomeLastMonth += IncomeLastMonth * mainClass.Sciense.BetterDigFromSciense / 100;
         ExcavatedSoil += IncomeLastMonth;
-        Asteroid.ElementCapacity -= IncomeLastMonth;
+        //Asteroid.ElementCapacity -= IncomeLastMonth;
         CalculateSupplyConsuption();
         Asteroid.AsterPanel.UpdateText();
     }
@@ -63,9 +63,9 @@ public class MiningStation : MonoBehaviour
         }
     }
 
-    public void ReadyForLoad(float kf)
+    public void ReadyForLoad()
     {
-        AmountReadyForLoading = ExcavatedSoil * kf;
+        AmountReadyForLoading = ExcavatedSoil;
     }
 
     private void FixedUpdate()

@@ -12,10 +12,11 @@ public class Corporates : MonoBehaviour
 
     public void CreateCorporates(bool isNewGame)
     {
-        for(int i=0;i<mainClass.Materials.MaterialsCount() - 1; i++)
+        /*
+        for(int i=0;i<1; i++)
         {
             CreateMiningCorporate(mainClass.Materials.GetMaterial(i), isNewGame);
-        }        
+        }    */    
     }
     public MiningCorporate GetMiningCorporates(int id)
     {

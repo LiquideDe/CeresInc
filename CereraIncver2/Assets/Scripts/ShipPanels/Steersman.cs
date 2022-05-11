@@ -51,7 +51,7 @@ public class Steersman : MonoBehaviour
     {
         if (Mathf.Abs(ship.ShipsDock.position.y - Dock.transform.position.y) < 0.1)
         {            
-            ship.Engines.OMSStop();            
+            ship.Engines.OMSStop();
             ship.Navigator.DockIsSuccessfull(isToWarehouse);
             Rotated = false;
             Towards = false;
@@ -75,6 +75,7 @@ public class Steersman : MonoBehaviour
         else if(Vector3.Distance(transform.position, Dock.transform.position) > 40)
         {
             EngineMove(Dock);
+            //Debug.Log($"Двигаемся к доку");
         }
     }
 

@@ -147,7 +147,6 @@ public class AsteroidPanel : MonoBehaviour, IPointerDownHandler, IBeginDragHandl
             asteroid.MiningStation.WorkersPlanned -= 1;
             mainClass.Ceres.FreeWorkers += 1;
             mainClass.Ceres.WorkersAwaiting -= 1;
-            mainClass.UpdateText();
             
         }
         else if (value != 0 && asteroid.MiningStation.AwaitingWorkers > 0)
@@ -160,7 +159,6 @@ public class AsteroidPanel : MonoBehaviour, IPointerDownHandler, IBeginDragHandl
             asteroid.MiningStation.WorkersPlanned += 1;
             mainClass.Ceres.FreeWorkers -= 1;
             mainClass.Ceres.WorkersAwaiting += 1;
-            mainClass.UpdateText();
         }
         asteroid.MiningStation.CalculateSupplyConsuption();
         UpdateText();        

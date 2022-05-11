@@ -9,17 +9,11 @@ public class PassangerShip : Ship
     public int CargoWorkers { get; set; }
     public float CargoFood { get; set; }
     public float CargoEquipment { get; set; }
-    public int AwaitingCargoWorkers { get; set; }
-    public float AwaitingCargoFood { get; set; }
-    public float AwaitingCargoEquipment { get; set; }
     private int demandWorkers;
     private float demandEquip, demandFood;
     public int DemandWorkers { get { return demandWorkers; } set { if(value>0) demandWorkers = value; } }
     public float DemandEquip { get { return demandEquip; } set { if(value>0) demandEquip = value; } }
     public float DemandFood { get { return demandFood; } set { if(value>0) demandFood = value; } }
-    
-    [SerializeField] private GameObject routePassangerPanel;
-    [SerializeField] private CanvasPasShip canvasPasShip;
 
     public override float CalculateAllMass()
     {
@@ -29,85 +23,7 @@ public class PassangerShip : Ship
 
     public void CalculateWeightPlayLoad()
     {
-        WeightPlayload = AwaitingCargoWorkers * 80 + AwaitingCargoFood + AwaitingCargoEquipment * 10;        
-    }
-
-    public override void OpenDestinationPanel()
-    {
-        CanvasShip.SetActive(true);
-        routePassangerPanel.SetActive(true);
-    }
-
-    public override void CloseDestinationPanel()
-    {
-        CanvasShip.SetActive(false);
-        routePassangerPanel.SetActive(false);
-    }
-
-    public override void ChooseDestination(AsteroidForPlayer aster)
-    {
-        if (!Navigator.IsInJourney && aster.MiningStation != null)
-        {
-            //Выбираем астероид до которого летим и добавляем его в массив. Если массив пустой, то просто добавляем цель в массив целей и строим простой отрезок
-            if (Navigator.OldDestinationsCount() == 0)
-            {                
-                Navigator.SetOldDestination(aster.MiningStation);                
-            }
-            //проверяем, что новая точка которую хотим добавить не такая же как в массиве, если такая же, то наоборот удаляем ее из массива, если другая. то добавляем
-            //Линию перестраиваем в любом случае
-            else if (ContainMas(aster) == true)
-            {
-                Navigator.RemoveOldDestination(aster.MiningStation);
-            }
-            else
-            {
-                Navigator.SetOldDestination(aster.MiningStation); 
-            }
-
-            
-            CalculateDemands();
-            Navigator.CalculateDistance();
-            CalculatedV();
-            Navigator.CalculateTime();
-            if (Navigator.OldDestinationsCount() > 0)
-            {
-                shipButton.UpdateText((int)Navigator.DvToOperation, WeightContruction + WeightFuel + WeightPlayload, CostOfJourney, Navigator.GetOldDestination(0).Asteroid.AsterName, Navigator.TimeToJourney, Age);
-            }
-            else
-            {
-                shipButton.UpdateText((int)Navigator.DvToOperation, WeightContruction + WeightFuel + WeightPlayload, CostOfJourney, "", Navigator.TimeToJourney, Age);
-            }
-
-
-
-            DrawLines();
-            UpdateText();
-
-
-        }
-
-    }
-
-    void CalculateDemands()
-    {
-        demandWorkers = 0;
-        demandEquip = 0;
-        demandFood = 0;
-
-        for (int i = 0; i < Navigator.OldDestinationsCount(); i++)
-        {
-            demandWorkers += Navigator.GetOldDestination(i).WorkersPlanned;
-            demandEquip += (int)Navigator.GetOldDestination(i).EquipmentPlanned;
-            demandFood += (int)Navigator.GetOldDestination(i).FoodPlanned;
-        }
-        
-    }
-
-    
-
-    public override void UpdateText()
-    {
-        canvasPasShip.UpdateText();
+        WeightPlayload = DemandWorkers * 80 + DemandFood + DemandEquip * 10;        
     }
 
     public override void Docking(MiningStation station)
@@ -165,23 +81,20 @@ public class PassangerShip : Ship
     {
         shipButton.StandAtCeres();
         panelShip.UpdateText(Id);
+        Navigator.StartBreakingDay = mainClass.CeresTime;
+        Debug.Log($"Пристыковались {Navigator.StartBreakingDay}");
         if(CargoWorkers > 0)
         {
             mainClass.Ceres.FreeWorkers += CargoWorkers;
             CargoWorkers = 0;
-        }
-        if (Navigator.Repeat)
-        {
-            StartAllowed();
-            Navigator.IsStartAllowed = true;            
-        }
+        }        
     }
 
     private void LoadingCargos()
     {
-        CargoWorkers = AwaitingCargoWorkers;
-        CargoEquipment = AwaitingCargoEquipment;
-        CargoFood = AwaitingCargoFood;
+        CargoWorkers = demandWorkers;
+        CargoEquipment = demandEquip;
+        CargoFood = demandFood;
     }
 
     public override bool ToWarehouseOrNot(int beginOrEnd)
@@ -204,12 +117,9 @@ public class PassangerShip : Ship
     protected override void SaveCargo(SaveLoadShip save)
     {
         save.cargoWorkers = CargoWorkers;
-        save.awaitingCargoWorkers = AwaitingCargoWorkers;
         save.demandWorkers = DemandWorkers;
         save.cargoFood = CargoFood;
         save.cargoEquipment = CargoEquipment;
-        save.awaitingCargoFood = AwaitingCargoFood;
-        save.awaitingCargoEquipment = AwaitingCargoEquipment;
         save.demandEquip = DemandEquip;
         save.demandFood = DemandFood;
     }
@@ -217,13 +127,25 @@ public class PassangerShip : Ship
     protected override void LoadCargo(SaveLoadShip save)
     {
         CargoWorkers = save.cargoWorkers;
-        AwaitingCargoWorkers = save.awaitingCargoWorkers;
         DemandWorkers = save.demandWorkers;
         CargoFood = save.cargoFood;
         CargoEquipment = save.cargoEquipment;
-        AwaitingCargoFood = save.awaitingCargoFood;
-        AwaitingCargoEquipment = save.awaitingCargoEquipment;
         DemandEquip = save.demandEquip;
         DemandFood = save.demandFood;
+    }
+
+    public override void DeterminingRequiredCargo(List<MiningStation> stations)
+    { 
+        demandWorkers = 0;
+        demandEquip = 0;
+        demandFood = 0;
+
+        for (int i = 0; i < stations.Count; i++)
+        {
+            demandWorkers += stations[i].WorkersPlanned - stations[i].WorkersOnStation;
+            demandEquip += stations[i].EquipmentPlanned;
+            demandFood += stations[i].FoodPlanned;
+        }
+        Debug.Log($"demandWorkers = {demandWorkers}");
     }
 }

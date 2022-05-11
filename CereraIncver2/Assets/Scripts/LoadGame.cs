@@ -302,7 +302,6 @@ public class LoadGame : MonoBehaviour
         mainClass.CreatePanels();
         mainClass.PanelStation.CreateButtons();
         mainClass.GameIsStarted = true;
-        mainClass.HelloPanel.SetActive(false);
-        mainClass.UpdateText();        
+        mainClass.HelloPanel.SetActive(false);  
     }
 }

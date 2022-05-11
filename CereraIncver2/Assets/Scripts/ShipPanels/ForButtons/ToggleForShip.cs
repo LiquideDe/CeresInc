@@ -8,7 +8,6 @@ public abstract class ToggleForShip : MonoBehaviour, IPointerDownHandler, IPoint
 {
     [SerializeField] GameObject greenLight, redLight, pushGreen, pushRed;
     [SerializeField] protected Ship ship;   
-    public ToggleForShip AnotherToggle { get; set; }
 
     public void SetShip(Ship ship)
     {
@@ -33,18 +32,15 @@ public abstract class ToggleForShip : MonoBehaviour, IPointerDownHandler, IPoint
         {
             UnPushingRed();
             TurningOff();
-            AnotherToggle.UnPushingRed();
         }
         else if(TurningOn())
         {
             UnPushingGreen();
-            AnotherToggle.UnPushingGreen();
 
         }
         else
         {
             UnPushingRedFromRed();
-            AnotherToggle.UnPushingRedFromRed();
         }
     }
 

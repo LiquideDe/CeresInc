@@ -15,5 +15,6 @@ public interface IAsteroid
     public float ElementCapacity { get; }
     public string AsterName { get; }
     public int Id { get; }
+    public Vector3 Position { get; }
 
 }

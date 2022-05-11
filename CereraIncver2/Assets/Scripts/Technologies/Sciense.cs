@@ -148,7 +148,49 @@ public abstract class Sciense: MonoBehaviour
         return techResource.Count;
     }
 
-    
+    public Engine GetNewestEngine()
+    {
+        Engine engine = null;
+        for (int i = 0; i < techEngine.Count; i++)
+        {
+            if (techEngine[i].IsResearched)
+            {
+                engine = techEngine[i];
+            }
+        }
+
+        return engine;
+    }
+
+    public Carcass GetNewestCarcass()
+    {
+        Carcass carcass = null;
+        for(int i = 0; i < techCarcass.Count; i++)
+        {
+            if (techCarcass[i].IsResearched)
+            {
+                carcass = techCarcass[i];
+            }
+        }
+
+        return carcass;
+    }
+
+    public FuelTank GetNewestFuelTank()
+    {
+        FuelTank fuelTank = null;
+        for(int i = 0; i < techFuelTank.Count; i++)
+        {
+            if (techFuelTank[i].IsResearched)
+            {
+                fuelTank = techFuelTank[i];
+            }
+        }
+
+        return fuelTank;
+    }
+
+
 
     public abstract void CalculationMonth();    
 

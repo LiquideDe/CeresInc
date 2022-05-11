@@ -220,12 +220,13 @@ public class MiningCorporate : Corporate, ICorporateShare
             if(ShipDepartment.CountShips() == 0)
             {
                 BuildNewShip(0);
-                BuildNewShip(1);
+                //BuildNewShip(1);
             }
             
             if(FreeWorkers - PlannedWorkerForWork > 10 && !NoMoreAsteroids)
             {
-                MiningDepartment.FindNearestAsteroid();
+                Debug.Log($"У нас есть свободные рабочие не задействованные нигде, ищем куда бы их деть");
+                MiningDepartment.FindNearestAsteroid(FreeWorkers - PlannedWorkerForWork);
             }
             ShipDepartment.ShipWorking();        
 

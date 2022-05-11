@@ -14,7 +14,11 @@ public class PanelShip : Spisok
     //далее другие кнопки
     [SerializeField]
     private GUI gui;
-    [SerializeField] private Text textNamePr, textPropShip;
+    [SerializeField] private Text textNamePr, textPropShip, textAboutBreakingDay;
+    [SerializeField] private ShipRoutes shipRoutes;
+    [SerializeField] private Dropdown routeDropdown;
+    [SerializeField] private Slider sliderBreakingDay;
+    public ShipRoutes ShipRoutes { get { return shipRoutes; } }
     
     public GameObject panelShip, buttonCreateRoute;
     private Ship ship;
@@ -84,9 +88,31 @@ public class PanelShip : Spisok
             {
                 textPropShip.text += $"\n Корабль на приколе";
             }
+
+            routeDropdown.ClearOptions();
+            for(int i = 0; i < ShipRoutes.CountRoutes(); i++)
+            {
+                routeDropdown.options.Add(new Dropdown.OptionData(ShipRoutes.GetRoute(i).NameRoute));
+            }
+            routeDropdown.value = ship.Navigator.IdRoute;
+            routeDropdown.RefreshShownValue();
+            sliderBreakingDay.value = ship.Navigator.BreakBetweenJourneys;
         }
-        
-        
+    }
+
+    public void ChangeRoute()
+    {
+        if (!ship.Navigator.IsInJourney)
+        {
+            ship.Navigator.SetRoute(ShipRoutes.GetRoute(routeDropdown.value), (int)sliderBreakingDay.value);
+            textAboutBreakingDay.text = $"Перерыв между полетами {sliderBreakingDay.value} дней";
+        }
+        else
+        {
+            routeDropdown.value = ship.Navigator.IdRoute;
+            routeDropdown.RefreshShownValue();
+            textAboutBreakingDay.text = $"Перерыв между полетами {ship.Navigator.BreakBetweenJourneys} дней";
+        }
     }
 
     public void ClosePanelShip()
@@ -110,14 +136,14 @@ public class PanelShip : Spisok
         {
             mainClass.Player.GetAsteroid(i).AsteroidGameObject.SetActive(true);
         }
-        //Включаем фильтры для карты
-        //togglesElements.SetActive(true);        
-        ship.OpenDestinationPanel();
+
+        shipRoutes.CreateNewRoute();
+        shipRoutes.gameObject.SetActive(true);
     }
 
     public void ChooseAsteroidForShip(AsteroidForPlayer aster)
     {
-        ship.ChooseDestination(aster);
+        shipRoutes.ChooseDestination(aster);
     }
 
     public void CloseCreateRoute()
@@ -128,8 +154,9 @@ public class PanelShip : Spisok
             mainClass.Asteroids.GetAsteroid(i).gameObject.SetActive(true);
 
         }
+        shipRoutes.gameObject.SetActive(false);
         //togglesElements.SetActive(false);
-        
+
     }
 
     public void DestroyShip()

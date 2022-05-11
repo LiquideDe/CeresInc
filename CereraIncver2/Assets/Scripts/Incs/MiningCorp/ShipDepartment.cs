@@ -54,6 +54,7 @@ public class ShipDepartment
             }
             else if(!ships[i].IsInJourney && !isShipPlanned)
             {
+                Debug.Log($"Создаем маршрут");
                 CreateRoute(ships[i]);
                 isShipPlanned = true;
             }
@@ -71,6 +72,7 @@ public class ShipDepartment
         
         if(ship.TypeShip == 0)
         {
+            Debug.Log($"Для пассажирскогоо корабля");
             CreatePasRoute(ship);
         }
         else
@@ -84,15 +86,11 @@ public class ShipDepartment
     {        
         for (int i = 0; i < Corporate.MiningDepartment.CountAsteroids(); i++)
         {
-            Debug.Log($"Количество астероидов {Corporate.MiningDepartment.CountAsteroids()}");
+            Debug.Log($"Количество астероидов {Corporate.MiningDepartment.CountAsteroids()}, проверяем {i}");
             if(Corporate.MiningDepartment.GetAsteroid(i).WorkersOnStation != Corporate.MiningDepartment.GetAsteroid(i).WorkersPlanned)
             {
-                if(ship.CountDestination() < 3)
-                {
-                    ship.AddDestination(Corporate.MiningDepartment.GetAsteroid(i));
-                    Debug.Log($"Кораблю добавлена точка {Corporate.MiningDepartment.GetAsteroid(i).AsterName}");
-                }
-                    
+                Debug.Log($"Кораблю добавлена точка {Corporate.MiningDepartment.GetAsteroid(i).AsterName}");
+                ship.AddDestination(Corporate.MiningDepartment.GetAsteroid(i));  
             }
         }
         ship.GoToJourney();

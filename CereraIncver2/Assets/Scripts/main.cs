@@ -45,6 +45,7 @@ public class main : MonoBehaviour
     [SerializeField] private CorpPanel corpPanel;
     [SerializeField] private PanelWithElements panelWithElements;
     [SerializeField] private EventPanel eventPanel;
+    [SerializeField] private ShipRoutes shipRoutes;
 
     public LoadGame LoadGame { get { return loadGame; } }
     public PanelShip PanelShip { get { return panelShip; } }
@@ -67,6 +68,8 @@ public class main : MonoBehaviour
     public Corporates Corporates { get { return corporates; } }
     public CorpPanel CorpPanel { get { return corpPanel; } }
     public EventPanel EventPanel { get { return eventPanel; } }
+    public ShipRoutes ShipRoutes { get { return shipRoutes; } }
+    public bool IsInputField { get { return isInputField; } }
 
     // Start is called before the first frame update
     void Start()
@@ -125,7 +128,6 @@ public class main : MonoBehaviour
         string path = SavePath + "Ceres.db";        
         
         //DB.SaveInSql();
-        UpdateText();
         gUI.StartNewGame();
         panelCreateGame.SetActive(false);
         corporates.CreateCorporates(true);
@@ -199,7 +201,6 @@ public class main : MonoBehaviour
                 ceres.CalculationSeason();
                 EventPanel.CreateEvents();
                 EventPanel.EventHappen();
-                UpdateText();
             }
             if(460 - dayBeforeArrival >= 460)
             {
@@ -209,9 +210,8 @@ public class main : MonoBehaviour
                 panelOrder.Arrival();
                 Corporates.Arrival();
             }
-        
+            UpdateText();
         }
-
     }
 
     public void UpdateText()

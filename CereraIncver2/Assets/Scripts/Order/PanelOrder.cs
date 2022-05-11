@@ -212,7 +212,6 @@ public class PanelOrder : Spisok
         textFoodAmount.text = $"{order.food} Í„";
         textMass.text = $"{order.masAll}/{order.maxMas}";
         order.textMas.text = $"{order.masAll}/{order.maxMas}";
-        mainClass.UpdateText();
     }
 
     private int PlusEF(ref int supplies, int maxmas, int masall, float price)
@@ -267,7 +266,6 @@ public class PanelOrder : Spisok
         textFoodAmount.text = $"{order.food} Í„";
         textMass.text = $"{order.masAll}/{order.maxMas}";
         order.textMas.text = $"{order.masAll}/{order.maxMas}";
-        mainClass.UpdateText();
     }
 
     private int MinusEF(ref int supplies, int masall, float price)
@@ -314,7 +312,6 @@ public class PanelOrder : Spisok
         textMass.text = $"{order.masAll}/{order.maxMas}";
         order.textMas.text = $"{order.masAll}/{order.maxMas}";
         mainClass.Player.Money -= 1000;
-        mainClass.UpdateText();
     }
 
     public void FireWorker()
@@ -325,7 +322,6 @@ public class PanelOrder : Spisok
         textMass.text = $"{order.masAll}/{order.maxMas}";
         order.textMas.text = $"{order.masAll}/{order.maxMas}";
         mainClass.Player.Money -= 1000;
-        mainClass.UpdateText();
     }
 
     public void BuyCarcassPas()
@@ -343,7 +339,6 @@ public class PanelOrder : Spisok
             textMass.text = $"{order.masAll}/{order.maxMas}";
             order.textMas.text = $"{order.masAll}/{order.maxMas}";
             mainClass.Player.Money -= mainClass.Sciense.GetCarcass(dpdCarcPas.value).Cost;
-            mainClass.UpdateText();
         }
         
     }
@@ -363,7 +358,6 @@ public class PanelOrder : Spisok
             textMass.text = $"{order.masAll}/{order.maxMas}";
             order.textMas.text = $"{order.masAll}/{order.maxMas}";
             mainClass.Player.Money += mainClass.Sciense.GetCarcass(dpdCarcPas.value).Cost;
-            mainClass.UpdateText();
         }
         
     }
@@ -383,7 +377,6 @@ public class PanelOrder : Spisok
             textMass.text = $"{order.masAll}/{order.maxMas}";
             order.textMas.text = $"{order.masAll}/{order.maxMas}";
             mainClass.Player.Money -= mainClass.Sciense.GetCarcass(dpdCarcCargo.value).Cost;
-            mainClass.UpdateText();
         }
 
     }
@@ -403,7 +396,6 @@ public class PanelOrder : Spisok
             textMass.text = $"{order.masAll}/{order.maxMas}";
             order.textMas.text = $"{order.masAll}/{order.maxMas}";
             mainClass.Player.Money += mainClass.Sciense.GetCarcass(dpdCarcCargo.value).Cost;
-            mainClass.UpdateText();
         }
 
     }
@@ -423,7 +415,6 @@ public class PanelOrder : Spisok
             textMass.text = $"{order.masAll}/{order.maxMas}";
             order.textMas.text = $"{order.masAll}/{order.maxMas}";
             mainClass.Player.Money -= mainClass.Sciense.GetFuelTank(dpdTank.value).Cost; 
-            mainClass.UpdateText();
         }
     }
 
@@ -442,7 +433,6 @@ public class PanelOrder : Spisok
             textMass.text = $"{order.masAll}/{order.maxMas}";
             order.textMas.text = $"{order.masAll}/{order.maxMas}";
             mainClass.Player.Money += mainClass.Sciense.GetFuelTank(dpdTank.value).Cost;
-            mainClass.UpdateText();
         }
     }
 
@@ -461,7 +451,6 @@ public class PanelOrder : Spisok
             textMass.text = $"{order.masAll}/{order.maxMas}";
             order.textMas.text = $"{order.masAll}/{order.maxMas}";
             mainClass.Player.Money -= mainClass.Sciense.GetEngine(dpdEngine.value).Cost;
-            mainClass.UpdateText();
         }
     }
 
@@ -480,7 +469,6 @@ public class PanelOrder : Spisok
             textMass.text = $"{order.masAll}/{order.maxMas}";
             order.textMas.text = $"{order.masAll}/{order.maxMas}";
             mainClass.Player.Money += mainClass.Sciense.GetEngine(dpdEngine.value).Cost;
-            mainClass.UpdateText();
         }
     }
 

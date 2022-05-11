@@ -10,7 +10,7 @@ public class ShipButton : MonoBehaviour, IPointerClickHandler
 	public PanelShip panelShip;
 	public Text nameShip, typeShip, dV, mas, destination, timeToReturn, age; // текст главной кнопки
 	public GameObject red, yellow, green, greyRed, greyYellow, greyGreen;
-	public ToggleForShip toggleStart, toggleRepeat;
+	public ToggleForShip toggleRepeat;
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
@@ -21,7 +21,6 @@ public class ShipButton : MonoBehaviour, IPointerClickHandler
     {
 		dV.text = $"dV = {dv} м/с";
 		this.mas.text = $"Mas = {mas} кг.";
-		this.destination.text = $"Летит к {destination}";
 		this.timeToReturn.text = $"Вернется через {timeToReturn} дней";
 		this.age.text = $"Возраст - {age} г.";
     }
@@ -34,9 +33,6 @@ public class ShipButton : MonoBehaviour, IPointerClickHandler
 		greyYellow.SetActive(true);
 		green.SetActive(false);
 		greyGreen.SetActive(true);
-		toggleStart.UnPushingRed();
-		toggleStart.AnotherToggle.UnPushingRed();
-
 	}
 
 	public void Docking()

@@ -6,11 +6,12 @@ using UnityEngine.UI;
 
 public class BuildShip : MonoBehaviour
 {
-    [SerializeField] private Dropdown dpDCarcas, dpDFuel, dpDEngine;
-    [SerializeField] private Text textOut;
+    [SerializeField] private Dropdown dpDCarcas, dpDFuel, dpDEngine, dpdRoute;
+    [SerializeField] private Text textOut, textBreak;
     [SerializeField] private GameObject passangerShip, cargoShip, panelBuildShip, panelShip, panelChooseType, buttonBuild;
     [SerializeField] private InputField nameNewShip;
     [SerializeField] private ScienseForPlayer sciense;
+    [SerializeField] private Slider sliderDaysBreak;
     private int typeShip = 0;
     public main mainClass;
     Carcass carcass = null;
@@ -35,6 +36,7 @@ public class BuildShip : MonoBehaviour
         dpDCarcas.ClearOptions();
         dpDFuel.ClearOptions();
         dpDEngine.ClearOptions();
+        dpdRoute.ClearOptions();
 
         //Через три цикла заполняем каждую дпд, в зависимости от наличия деталей на складе
         if(typeShip == 0)
@@ -61,9 +63,15 @@ public class BuildShip : MonoBehaviour
             if (mainClass.Player.CountEngine(i) != 0)
                 dpDEngine.options.Add(new Dropdown.OptionData(sciense.GetEngine(i).NameTech));
         }
+
+        for(int i = 0; i < mainClass.PanelShip.ShipRoutes.CountRoutes(); i++)
+        {
+            dpdRoute.options.Add(new Dropdown.OptionData(mainClass.PanelShip.ShipRoutes.GetRoute(i).NameRoute));
+        }
         dpDCarcas.RefreshShownValue();
         dpDFuel.RefreshShownValue();
         dpDEngine.RefreshShownValue();
+        dpdRoute.RefreshShownValue();
 
         UpdateTextOut();
 
@@ -139,8 +147,12 @@ public class BuildShip : MonoBehaviour
             }                
             mainClass.Player.PlusEngine(engine.Id, -1);
             mainClass.Player.PlusFuelTank(fuelTank.Id, -1);
-            mainClass.UpdateText();
             mainClass.Warehouse.UpdateText();
+            if(mainClass.ShipRoutes.GetRoute(dpdRoute.value) != null)
+            {
+                ship.Navigator.SetRoute(mainClass.ShipRoutes.GetRoute(dpdRoute.value), (int)sliderDaysBreak.value);
+                Debug.Log($"Поставили маршрут");
+            }
             CloseBuildPanel();
         }
 
@@ -152,21 +164,22 @@ public class BuildShip : MonoBehaviour
 
         var but = mainClass.PanelShip.GetLastButton().GetComponent<ShipButton>();
         but.nameShip.text = nameNewShip.text;
-        but.typeShip.text = $"{typeShip}";
+        if(typeShip == 0)
+        {
+            but.typeShip.text = $"Пассажирский";
+        }
+        else
+        {
+            but.typeShip.text = "Грузовой";
+        }
+
         but.age.text = $"0";
-        but.destination.text = "";
+        but.destination.text = $"Маршрут номер {ship.Navigator.IdRoute}";
         but.dV.text = "";
         but.id = ship.Id;
         but.mas.text = $"Mas - {ship.WeightContruction} кг";
         but.timeToReturn.text = $"";
-        but.toggleStart.SetShip(ship);
         but.toggleRepeat.SetShip(ship);
-
-        IToggleShip toggle = ship.CanvasShip.GetComponent<IToggleShip>();
-        but.toggleStart.AnotherToggle = toggle.ToggleStart;
-        but.toggleRepeat.AnotherToggle = toggle.ToggleRepeat;
-        toggle.ToggleStart.AnotherToggle = but.toggleStart;
-        toggle.ToggleRepeat.AnotherToggle = but.toggleRepeat;
 
         ship.ShipButton = but;
     }
@@ -191,5 +204,10 @@ public class BuildShip : MonoBehaviour
         ship.gameObject.SetActive(true);
         ship.LoadData(save);
         AddToListButton(save.id, save.shipName, ship);
+    }
+
+    public void ChangeSlider()
+    {
+        textBreak.text = $"Перерыв между полетами {sliderDaysBreak.value} дней";
     }
 }

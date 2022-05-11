@@ -33,11 +33,13 @@ public class ShipForSimulation
 
     private void CalculateTime()
     {
-        DaysForTrip = ((Distance) / (DvToOperation * 86.4f/1000)) + destinations.Count * 5;        
+        DaysForTrip = ((Distance) / (DvToOperation * 86.4f/1000)) + destinations.Count * 5;
+        Debug.Log($"Поездка составит {DaysForTrip} дней");
     }
 
     private void CalculateDistance()
     {
+        distances.Clear();
         if (destinations.Count >= 1)
         {
             for (int i = 0; i < destinations.Count; i++)
@@ -59,30 +61,20 @@ public class ShipForSimulation
 
     private void CalculateDestination()
     {
-        float dist = 0;
-        float dv = (float)Math.Round(ISP * Math.Log((CalculateAllMass() + WeightFuel) / CalculateAllMass()), 0) / ((destinations.Count + 1) * 2);
-        if (destinations.Count >= 1)
+        CalculateDistance();
+        CalculatedV();        
+
+        for (int i = 1; i < destinations.Count; i++)
         {
-            for (int i = 0; i < destinations.Count; i++)
+            if(distances[i]/distances[i-1] > 0.3)
             {
-                if (i == 0)
-                {
-                    dist = Vector3.Distance(new Vector3(0, 0, 0), destinations[0].Position);
-                }
-                else
-                {
-                    dist += Vector3.Distance(destinations[i - 1].Position, destinations[i].Position);
-                }
-            }
-            dist += Vector3.Distance(destinations[destinations.Count - 1].Position, new Vector3(0, 0, 0));
-            
-            if (dist / (dv * 86.4f / 1000) > 900)
-            {
-                destinations.RemoveAt(destinations.Count - 1);
-                Debug.Log($"Астероид слишком далек, удаляем его");
+                Debug.Log($"Следующая дистанция {distances[i]} больше чем на 30% предыдущего пути {distances[i - 1]} ");
+                distances.RemoveAt(i);
+                destinations.RemoveAt(i);
                 CalculateDestination();
+                break;
             }
-        }
+        }        
     }
 
     private void CalculatedV()
@@ -163,9 +155,8 @@ public class ShipForSimulation
                     Equipment += Corporate.Equipment;
                     Corporate.Equipment = 0;
                 }
-
-
             }
+            Debug.Log($"Летим с {Workers} рабочих, с {Food} еды и с {Equipment} экипировки");
         }
     }
 
@@ -184,8 +175,10 @@ public class ShipForSimulation
     private void PreCalculation()
     {
         CalculateDestination();
-        if(destinations.Count > 0)
+        Debug.Log($"Все расчеты выполнены, точек сделано {destinations.Count}");
+        if (destinations.Count > 0)
         {
+            Debug.Log($"Загружаемся");
             LoadCargo();
             CalculatedV();
             CalculateDistance();
@@ -232,11 +225,13 @@ public class ShipForSimulation
 
     public void GoToJourney()
     {
+        Debug.Log($"Делаем предварительные просчеты по поездке");
         PreCalculation();
         if(destinations.Count > 0)
         {
             StartDay = MainClass.CeresTime;
             IsInJourney = true;
+            Debug.Log($"ПОЕХАЛИ, стартовое время {StartDay}");
         }       
 
     }
@@ -247,7 +242,7 @@ public class ShipForSimulation
         {
             if (!IsLastDestination)
             {
-                if (StartDay + ((distances[0] / DvToOperation) + destinations.Count * 5) < MainClass.CeresTime)
+                if (StartDay + ((distances[0] / (DvToOperation * 86.4f / 1000)) + destinations.Count * 5) < MainClass.CeresTime)
                 {
                     if (TypeShip == 0)
                     {
