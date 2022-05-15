@@ -10,13 +10,15 @@ public class Corporates : MonoBehaviour
     [SerializeField] private GameObject corporateTemplate;
     [SerializeField] private main mainClass;
 
-    public void CreateCorporates(bool isNewGame)
+    public IEnumerator CreateCorporates(bool isNewGame)
     {
-        /*
+        
         for(int i=0;i<1; i++)
         {
             CreateMiningCorporate(mainClass.Materials.GetMaterial(i), isNewGame);
-        }    */    
+        }
+        Debug.Log($"Корпорации создали");
+        yield return new WaitForSeconds(0.01f);
     }
     public MiningCorporate GetMiningCorporates(int id)
     {
@@ -48,7 +50,6 @@ public class Corporates : MonoBehaviour
     {
         for (int i = 0; i < miningCorporates.Count; i++)
         {
-            miningCorporates[i].ShipDepartment.NewRound();
             miningCorporates[i].FinanceDepartment.CalculationPriceShare();
         }
     }

@@ -18,6 +18,8 @@ public class MiningCorporate : Corporate, ICorporateShare
     public float Price { get; set; }
     public float AmountShip { get; set; }
     public bool NoMoreAsteroids { get; set; }
+    public bool IsRoutesCreate { get; set; }
+    public bool IsNeedComponentsForNewShips { get; set; }
 
     private List<int> carcassPas = new List<int>();
     private List<int> carcassCargo = new List<int>();
@@ -46,14 +48,20 @@ public class MiningCorporate : Corporate, ICorporateShare
         FreeWorkers = 70;
         Money = 10000000;
         ScienseDepartment.StartGame();
+        
     }
-    private void BuildNewShip(int type)
+    public void BuildNewShip(int type)
     {
         if (IsAllParts(type))
         {
             
             ShipDepartment.CreateShip(type, GetFreeDevice(carcassPas), GetFreeDevice(fuelTank), GetFreeDevice(engine));
             AmountShip += 1;
+        }
+        else
+        {
+            IsNeedComponentsForNewShips = true;
+            Debug.Log($"IsNeedComponentsForNewShips {IsNeedComponentsForNewShips}");
         }
     }
     private bool IsAllParts(int type)
@@ -127,7 +135,7 @@ public class MiningCorporate : Corporate, ICorporateShare
     public int CountFuelTank(int id = -1)
     {
         ///<summary>
-        ///Без параметров общее количество типов, с параметрами количество именно по индексу 
+        ///Без параметров - общее количество по индексу, с параметрами - количество именно по индексу 
         ///</summary>
         if (id >= 0)
         {
@@ -139,21 +147,21 @@ public class MiningCorporate : Corporate, ICorporateShare
 
     public void PlusCarcasPas(int id, int value)
     {
-        carcassPas[id] -= value;
+        carcassPas[id] += value;
     }
 
     public void PlusCarcasCargo(int id, int value)
     {
-        carcassCargo[id] -= value;
+        carcassCargo[id] += value;
     }
 
     public void PlusEngine(int id, int value)
     {
-        engine[id] -= value;
+        engine[id] += value;
     }
     public void PlusFuelTank(int id, int value)
     {
-        fuelTank[id] -= value;
+        fuelTank[id] += value;
     }
 
     private int CountDevice(List<int> device)
@@ -208,29 +216,35 @@ public class MiningCorporate : Corporate, ICorporateShare
         {
             //MainClass.Earth.PlusResAmount(OrientRes.Id, AmountResource);
             Money += AmountResource * OrientRes.Price;
-            AmountResource = 0;
-            FreeWorkers += 20;
+            AmountResource = 0;            
+        }
+        FreeWorkers += 25;
+        Food += 10000;
+        Equipment += 10000;
+        if (IsNeedComponentsForNewShips)
+        {
+            IsNeedComponentsForNewShips = false;
+            PlusCarcasPas(ScienseDepartment.GetNewestCarcass().Id, 1);
+            PlusCarcasCargo(ScienseDepartment.GetNewestCarcass().Id, 1);
+            PlusFuelTank(ScienseDepartment.GetNewestFuelTank().Id, 2);
+            PlusEngine(ScienseDepartment.GetNewestEngine().Id, 2);
+
+            Debug.Log($"Купили обороудование для двух новых кораблей");
         }
     }
 
     private void Update()
     {
-        if(!MainClass.IsPaused)
+        if(MainClass.GameIsStarted && !IsRoutesCreate)
         {
-            if(ShipDepartment.CountShips() == 0)
-            {
-                BuildNewShip(0);
-                //BuildNewShip(1);
-            }
-            
-            if(FreeWorkers - PlannedWorkerForWork > 10 && !NoMoreAsteroids)
-            {
-                Debug.Log($"У нас есть свободные рабочие не задействованные нигде, ищем куда бы их деть");
-                MiningDepartment.FindNearestAsteroid(FreeWorkers - PlannedWorkerForWork);
-            }
-            ShipDepartment.ShipWorking();        
-
-        }        
+            IsRoutesCreate = true;
+            MiningDepartment.FindAsteroids();
+            ShipDepartment.CreateRoutes();
+        }
+        if(!MainClass.IsPaused)
+        {            
+            ShipDepartment.ShipWorking();
+        }
     }
 
     public void SaveData(SaveLoadMiningCorp save)

@@ -19,6 +19,7 @@ public class AsteroidForSimulation : Asteroid, IAsteroid
     public int WorkersOnStation { get; set; }
     public float IncomeLastMonth { get; set; }
     private float wellbeing;
+    public bool IsInRoute { get; set; }
 
     public int Workers { get { return WorkersOnStation; } }
     public float AmountReadyForLoading { get { return ReadyToLoad; } }
@@ -34,7 +35,13 @@ public class AsteroidForSimulation : Asteroid, IAsteroid
         Food -= WorkersOnStation * FoodConsuption;
         Equipment -= WorkersOnStation * EquipmentConsuption;
         if (Food + Equipment < 2)
+        {
             wellbeing = (Food + Equipment) / 2;
+            if(wellbeing < 0)
+            {
+                wellbeing = 0;
+            }
+        }            
         else
             wellbeing = 1;
         IncomeLastMonth = 100 * WorkersOnStation * ElementAbundance * wellbeing;
@@ -55,6 +62,14 @@ public class AsteroidForSimulation : Asteroid, IAsteroid
         {
             FoodPlanned = 365 * (int)Math.Round((float)(WorkersPlanned * 0.5), 0) - (int)Food;
             EquipmentPlanned = 365 * (float)Math.Round((float)(WorkersPlanned * 0.1), 2) - Equipment;
+            if(FoodPlanned < 0)
+            {
+                FoodPlanned = 0;
+            }
+            if(EquipmentPlanned < 0)
+            {
+                EquipmentPlanned = 0;
+            }
         }
     }
 

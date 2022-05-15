@@ -102,6 +102,7 @@ public class GUI : MonoBehaviour
         {
             panels[i].SetActive(true);
         }
+        Debug.Log($"Раз");
         asteroidPanel.SetActive(true);
         yield return new WaitForEndOfFrame(); 
        

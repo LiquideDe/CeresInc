@@ -12,7 +12,7 @@ public class AsteroidCenter : MonoBehaviour
 
     
 
-    public void CreateAsteroids(int amount, bool isNewGame = true)
+    public IEnumerator CreateAsteroids(int amount, bool isNewGame = true)
     {
         for (int i = 0; i < amount; i++)
         {
@@ -31,8 +31,12 @@ public class AsteroidCenter : MonoBehaviour
 
         if (isNewGame)
         {
-            StartCoroutine(AsteroidAllocation(amount));
-        }       
+            yield return StartCoroutine(AsteroidAllocation(amount));
+        }
+        else
+        {
+            yield return new WaitForSeconds(0.01f);
+        }
         
     }
 

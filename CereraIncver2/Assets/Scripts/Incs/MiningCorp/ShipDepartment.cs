@@ -7,8 +7,9 @@ using UnityEngine;
 public class ShipDepartment
 {
     public MiningCorporate Corporate { get; set; }
-    List<ShipForSimulation> ships = new List<ShipForSimulation>();
-    private bool isShipPlanned;
+    public bool IsConstructShip { get; set; }
+    private List<ShipForSimulation> ships = new List<ShipForSimulation>();
+    private List<Route> routes = new List<Route>();
 
     public ShipDepartment(MiningCorporate corporate)
     {
@@ -29,7 +30,6 @@ public class ShipDepartment
         ships[id].WeightFuel = Corporate.ScienseDepartment.GetFuelTank(typeFuelTank).MaxFuel;
         ships[id].Id = id;
         ships[id].MainClass = Corporate.MainClass;
-
         
         Corporate.PlusEngine(typeEngine, -1);
         Corporate.PlusFuelTank(typeFuelTank, -1);
@@ -41,24 +41,57 @@ public class ShipDepartment
         {
             Corporate.PlusCarcasCargo(typeCarcass, -1);
         }
+        Debug.Log($"Создали новый корабль, дали ему маршрут");
+        SetRouteToShip(ships[id]);        
+    }
 
+    private void SetRouteToShip(ShipForSimulation ship)
+    {
+        Route route = null;
+        for(int i = 0; i < routes.Count; i++)
+        {
+            if(routes[i].AmountShipsOnRoute < 2)
+            {
+                route = routes[i];
+                break;
+            }
+        }
+        if(route != null)
+        {
+            for (int i = 1; i < routes.Count; i++)
+            {
+                if (route.CalculateTotalLengthRoute() > routes[i].CalculateTotalLengthRoute() && routes[i].AmountShipsOnRoute < 2)
+                {
+                    route = routes[i];
+                }
+            }
+            if (route.AmountShipsOnRoute < 2)
+            {
+                ship.SetRoute(route);
+                route.AmountShipsOnRoute += 1;
+                Debug.Log($"Маршрут {route.Id}");
+            }
+            else
+            {
+                Debug.Log($"никакой, routes.Count {routes.Count}, ships.Count {ships.Count}");
+            }
+        }        
+
+           
     }
 
     public void ShipWorking()
     {
         for(int i = 0; i < ships.Count; i++)
         {
-            if (ships[i].IsInJourney)
-            {
-                ships[i].AtWork();
-            }
-            else if(!ships[i].IsInJourney && !isShipPlanned)
-            {
-                Debug.Log($"Создаем маршрут");
-                CreateRoute(ships[i]);
-                isShipPlanned = true;
-            }
-            
+            ships[i].AtWork();
+        }
+        if(routes.Count * 2 > ships.Count && !IsConstructShip && !Corporate.IsNeedComponentsForNewShips)
+        {
+            IsConstructShip = true;
+            Corporate.BuildNewShip(0);
+            Corporate.BuildNewShip(1);
+            IsConstructShip = false;
         }
     }
 
@@ -67,61 +100,47 @@ public class ShipDepartment
         return ships.Count;
     }
 
-    public void CreateRoute(ShipForSimulation ship)
+    public void CreateRoutes()
     {
-        
-        if(ship.TypeShip == 0)
+        List<AsteroidForSimulation> asteroids = new List<AsteroidForSimulation>();
+        asteroids.AddRange(Corporate.MiningDepartment.GetAllAsteroids());        
+        for(int i = 0; i < asteroids.Count; i++)
         {
-            Debug.Log($"Для пассажирскогоо корабля");
-            CreatePasRoute(ship);
-        }
-        else
-        {
-            CreateCargoRoute(ship);
-        }
-        
-    }
-    
-    private void CreatePasRoute(ShipForSimulation ship)
-    {        
-        for (int i = 0; i < Corporate.MiningDepartment.CountAsteroids(); i++)
-        {
-            Debug.Log($"Количество астероидов {Corporate.MiningDepartment.CountAsteroids()}, проверяем {i}");
-            if(Corporate.MiningDepartment.GetAsteroid(i).WorkersOnStation != Corporate.MiningDepartment.GetAsteroid(i).WorkersPlanned)
+            if (!asteroids[i].IsInRoute)
             {
-                Debug.Log($"Кораблю добавлена точка {Corporate.MiningDepartment.GetAsteroid(i).AsterName}");
-                ship.AddDestination(Corporate.MiningDepartment.GetAsteroid(i));  
+                routes.Add(new Route());
+                routes[routes.Count - 1].SetDestination(asteroids[i]);
+                routes[routes.Count - 1].NameRoute = $"{i}";
+                asteroids[i].IsInRoute = true;
+                FindNeighbor(asteroids[i], asteroids, routes[routes.Count - 1]);                
             }
         }
-        ship.GoToJourney();
+        SetIdToRoutes();
+        Debug.Log($"Создали {routes.Count} маршрутов");
     }
 
-    private void CreateCargoRoute(ShipForSimulation ship)
+    private void FindNeighbor(AsteroidForSimulation asteroid, List<AsteroidForSimulation> asteroids, Route route)
     {
-        float cost = ship.CostJourney();
-        float weight = 0;
-
-        for(int i=0;i< Corporate.MiningDepartment.CountAsteroids(); i++)
+        float dist;
+        for (int i = 0; i < asteroids.Count; i++)
         {
-            weight += Corporate.MiningDepartment.GetAsteroid(i).ExcavatedSoil;
-        }
-        if(weight * Corporate.OrientRes.Price > cost)
-        {
-            
-            for (int i = 0; i < Corporate.MiningDepartment.CountAsteroids(); i++)
+            dist = Vector3.Distance(asteroid.Position, asteroids[i].Position);
+            if (dist < 800 && !asteroids[i].IsInRoute)
             {
-                if(Corporate.MiningDepartment.GetAsteroid(i).ExcavatedSoil > 0)
-                {
-                    ship.AddDestination(Corporate.MiningDepartment.GetAsteroid(i));
-                }                
+                route.SetDestination(asteroids[i]);
+                asteroids[i].IsInRoute = true;
+                FindNeighbor(asteroids[i], asteroids, route);
+                break;
             }
         }
-        ship.GoToJourney();
     }
 
-    public void NewRound()
+    private void SetIdToRoutes()
     {
-        isShipPlanned = false;
+        for(int i = 0; i < routes.Count; i++)
+        {
+            routes[i].Id = i;
+        }
     }
 
     public ShipForSimulation GetShip(int id)

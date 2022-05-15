@@ -30,91 +30,83 @@ public class ShipForSimulation
     public bool IsInJourney { get; set; }
     public bool IsLastDestination { get; set; }
     public int Id { get; set; }
+    public Route Route { get; set; }
+    public float StartBreakingDay { get; set; }
+    public float BreakBetweenJourneys { get; set; }
+    public bool IsDocking { get; set; }
 
-    private void CalculateTime()
+    public void AtWork()
     {
-        DaysForTrip = ((Distance) / (DvToOperation * 86.4f/1000)) + destinations.Count * 5;
-        Debug.Log($"Поездка составит {DaysForTrip} дней");
-    }
-
-    private void CalculateDistance()
-    {
-        distances.Clear();
-        if (destinations.Count >= 1)
+        if (IsInJourney)
         {
-            for (int i = 0; i < destinations.Count; i++)
+            if (!IsLastDestination)
             {
-                if (i == 0)
+                if (StartDay + ((distances[0] / (DvToOperation * 86.4f / 1000)) + destinations.Count * 5) < MainClass.CeresTime && !IsDocking)
                 {
-                    Distance = Vector3.Distance(new Vector3(0, 0, 0), destinations[0].Position);
-                    distances.Add(Distance);
-                }
-                else
-                {
-                    distances.Add(Vector3.Distance(destinations[i - 1].Position, destinations[i].Position));
-                    Distance += distances[i];
+                    IsDocking = true;
+                    if (TypeShip == 0)
+                    {
+                        Debug.Log($"Корабль {TypeShip} на маршруте {Route.Id}, Пристыковываемся, IsDocking {IsDocking}");
+                        for(int i = 0; i < destinations.Count; i++)
+                        {
+                            Debug.Log($"Пункт {i} - {destinations[i].AsterName}");
+                        }
+                        DockingPassanger();
+                    }
+                    else
+                    {
+                        DockingCargo();
+                    }
+                    IsDocking = false;
                 }
             }
-            Distance += Vector3.Distance(destinations[destinations.Count - 1].Position, new Vector3(0, 0, 0));            
+            else
+            {
+                if (StartDay + DaysForTrip < MainClass.CeresTime)
+                {
+                    IsInJourney = false;
+                    Debug.Log($"Корабль {TypeShip} на маршруте {Route.Id}, прибыл на базу");
+                    Corporate.AmountResource += Cargo;
+                    Cargo = 0;
+                    StartBreakingDay = MainClass.CeresTime;
+                    UpdateDestinations();
+                }
+            }
+        }
+        else if(StartBreakingDay + BreakBetweenJourneys < MainClass.CeresTime)
+        {
+            GoToJourney();
         }
     }
 
-    private void CalculateDestination()
+    private void GoToJourney()
     {
-        CalculateDistance();
-        CalculatedV();        
-
-        for (int i = 1; i < destinations.Count; i++)
+        Debug.Log($"Корабль {TypeShip} на маршруте {Route.Id}, Делаем предварительные просчеты по поездке");
+        
+        if (PreCalculation())
         {
-            if(distances[i]/distances[i-1] > 0.3)
-            {
-                Debug.Log($"Следующая дистанция {distances[i]} больше чем на 30% предыдущего пути {distances[i - 1]} ");
-                distances.RemoveAt(i);
-                destinations.RemoveAt(i);
-                CalculateDestination();
-                break;
-            }
-        }        
-    }
-
-    private void CalculatedV()
-    {
-        DV = (float)Math.Round(ISP * Math.Log((CalculateAllMass() + WeightFuel) / CalculateAllMass()), 0);
-        //смотрим количество пунктов и высчитываем сколько dV мы можем использовать на каждый пункт. Пока что поровну считаем.
-        DvToOperation = DV / ((destinations.Count + 1) * 2);        
-        CalcCostJourney();
-    }
-
-    private float CalculateWeightElements()
-    {
-        float answ = 0;
-        if(TypeShip == 1)
-        {
-            for (int i = 0; i < destinations.Count; i++)
-            {
-                answ += destinations[i].ReadyToLoad;
-            }
+            StartDay = MainClass.CeresTime;
+            IsInJourney = true;
+            Debug.Log($"Корабль {TypeShip} на маршруте {Route.Id}, ПОЕХАЛИ, стартовое время {StartDay}");
         }
-        return answ;
+
     }
 
-    private float CalculateAllMass()
+    private bool PreCalculation()
     {
-        return CalculateWeightElements() + Workers * 80 + Food + Equipment * 10 + Weight;
+        if(LoadCargo() && CalculatedV())
+        {
+            CalculateDistance();
+            CalculateTime();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
-    private void CalcCostJourney()
-    {
-        CostOfJourney = WeightFuel * MainClass.Materials.GetMaterial(TypeFuel).Price * 0.01f;
-    }
-
-    public float CostJourney()
-    {
-        CalcCostJourney();
-        return CostOfJourney;
-    }
-
-    private void LoadCargo()
+    private bool LoadCargo()
     {
         if (TypeShip == 0)
         {
@@ -123,7 +115,7 @@ public class ShipForSimulation
 
                 if (Corporate.FreeWorkers >= destinations[i].WorkersPlanned - destinations[i].WorkersOnStation && destinations[i].WorkersPlanned - destinations[i].WorkersOnStation > 0)
                 {
-                    Workers += destinations[i].WorkersPlanned - destinations[i].WorkersOnStation;                    
+                    Workers += destinations[i].WorkersPlanned - destinations[i].WorkersOnStation;
                     Corporate.FreeWorkers -= destinations[i].WorkersPlanned - destinations[i].WorkersOnStation;
                     Corporate.PlannedWorkerForWork -= destinations[i].WorkersPlanned - destinations[i].WorkersOnStation;
                 }
@@ -138,6 +130,7 @@ public class ShipForSimulation
                 {
                     Food += destinations[i].FoodPlanned;
                     Corporate.Food -= destinations[i].FoodPlanned;
+
                 }
                 else if (Corporate.Food > 0)
                 {
@@ -156,36 +149,76 @@ public class ShipForSimulation
                     Corporate.Equipment = 0;
                 }
             }
-            Debug.Log($"Летим с {Workers} рабочих, с {Food} еды и с {Equipment} экипировки");
+            Debug.Log($"Корабль {TypeShip} на маршруте {Route.Id}, Летим с {Workers} рабочих, с {Food} еды и с {Equipment} экипировки");
+            if(Workers < 0 || Food < 0 || Equipment < 0 || (Workers == 0 && Equipment == 0 && Food == 0))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    private bool CalculatedV()
+    {
+        DV = (float)Math.Round(ISP * Math.Log((CalculateAllMass() + WeightFuel) / CalculateAllMass()), 0);
+        //смотрим количество пунктов и высчитываем сколько dV мы можем использовать на каждый пункт. Пока что поровну считаем.
+        DvToOperation = DV / ((destinations.Count + 1) * 2);
+        CalcCostJourney();
+        if(DvToOperation > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
-
-    public void AddDestination(AsteroidForSimulation asteroid)
+    private void CalculateDistance()
     {
-        if (!IsInJourney)
+        distances.Clear();
+        if (destinations.Count >= 1)
         {
-            destinations.Add(asteroid);
+            for (int i = 0; i < destinations.Count; i++)
+            {
+                if (i == 0)
+                {
+                    Distance = Vector3.Distance(new Vector3(0, 0, 0), destinations[0].Position);
+                    distances.Add(Distance);
+                }
+                else
+                {
+                    distances.Add(Vector3.Distance(destinations[i - 1].Position, destinations[i].Position));
+                    Distance += distances[i];
+                }
+            }
+            Distance += Vector3.Distance(destinations[destinations.Count - 1].Position, new Vector3(0, 0, 0));
         }
+    }
+    private void CalculateTime()
+    {
+        DaysForTrip = ((Distance) / (DvToOperation * 86.4f/1000)) + destinations.Count * 5;
+        Debug.Log($"Корабль {TypeShip}, Поездка составит {DaysForTrip} дней");
+    }
+    private float CalculateAllMass()
+    {
+        return CalculateWeightElements() + Workers * 80 + Food + Equipment * 10 + Weight;
+    }
+    private float CalculateWeightElements()
+    {
+        float answ = 0;
         if(TypeShip == 1)
         {
-            asteroid.SetReadyToLoad();
+            for (int i = 0; i < destinations.Count; i++)
+            {
+                answ += destinations[i].ReadyToLoad;
+            }
         }
-    }
+        return answ;
+    }   
 
-    private void PreCalculation()
+    private void CalcCostJourney()
     {
-        CalculateDestination();
-        Debug.Log($"Все расчеты выполнены, точек сделано {destinations.Count}");
-        if (destinations.Count > 0)
-        {
-            Debug.Log($"Загружаемся");
-            LoadCargo();
-            CalculatedV();
-            CalculateDistance();
-            CalculateTime();
-        }        
+        CostOfJourney = WeightFuel * MainClass.Materials.GetMaterial(TypeFuel).Price * 0.01f;
     }
-
     private void DockingPassanger()
     {
         if (destinations[0].WorkersPlanned - destinations[0].WorkersOnStation > 0 && Workers >= destinations[0].WorkersPlanned - destinations[0].WorkersOnStation)
@@ -193,16 +226,33 @@ public class ShipForSimulation
             Workers -= destinations[0].WorkersPlanned - destinations[0].WorkersOnStation;
             destinations[0].WorkersOnStation += destinations[0].WorkersPlanned - destinations[0].WorkersOnStation;
         }
-        destinations[0].Food += destinations[0].FoodPlanned;
-        Food -= destinations[0].FoodPlanned;
-        destinations[0].Equipment += destinations[0].EquipmentPlanned;
-        Equipment -= destinations[0].EquipmentPlanned;
-        destinations[0].FoodPlanned = 0;
-        destinations[0].EquipmentPlanned = 0;
-        Debug.Log($"Разргрузили рабочих и припасы на астероид {destinations[0].AsterName}, на астероиде теперь работает {destinations[0].WorkersOnStation} человек");
+
+        if(Food > destinations[0].FoodPlanned)
+        {
+            destinations[0].Food += destinations[0].FoodPlanned;
+            Food -= destinations[0].FoodPlanned;
+        }
+        else if(Food > 0)
+        {
+            destinations[0].Food += Food;
+            Food = 0;
+        }
+
+        if(Equipment > destinations[0].EquipmentPlanned)
+        {
+            destinations[0].Equipment += destinations[0].EquipmentPlanned;
+            Equipment -= destinations[0].EquipmentPlanned;
+        }
+        else if(Equipment > 0)
+        {
+            destinations[0].Equipment += Equipment;
+            Equipment = 0;
+        }
+        
+        Debug.Log($"Корабль {TypeShip} на маршруте {Route.Id}, Разргрузили рабочих и припасы на астероид {destinations[0].AsterName}, на астероиде теперь работает {destinations[0].WorkersOnStation} человек");
         destinations.RemoveAt(0);
         distances.RemoveAt(0);
-        Debug.Log($"Осталось точек {destinations.Count}");
+        Debug.Log($"Корабль {TypeShip} на маршруте {Route.Id}, Осталось точек {destinations.Count}");
         CheckLastDestination();
     }
 
@@ -221,52 +271,7 @@ public class ShipForSimulation
         {
             IsLastDestination = true;
         }
-    }
-
-    public void GoToJourney()
-    {
-        Debug.Log($"Делаем предварительные просчеты по поездке");
-        PreCalculation();
-        if(destinations.Count > 0)
-        {
-            StartDay = MainClass.CeresTime;
-            IsInJourney = true;
-            Debug.Log($"ПОЕХАЛИ, стартовое время {StartDay}");
-        }       
-
-    }
-
-    public void AtWork()
-    {
-        if (IsInJourney)
-        {
-            if (!IsLastDestination)
-            {
-                if (StartDay + ((distances[0] / (DvToOperation * 86.4f / 1000)) + destinations.Count * 5) < MainClass.CeresTime)
-                {
-                    if (TypeShip == 0)
-                    {
-                        DockingPassanger();
-                    }
-                    else
-                    {
-                        DockingCargo();
-                    }
-
-                }
-            }
-            else
-            {
-                if (StartDay + DaysForTrip < MainClass.CeresTime)
-                {
-                    IsInJourney = false;
-                    Corporate.AmountResource += Cargo;
-                    Cargo = 0;
-                }
-            }          
-            
-        }
-    }
+    }    
 
     public int CountDestination()
     {
@@ -291,6 +296,27 @@ public class ShipForSimulation
     public void SetDistances(float dist)
     {
         distances.Add(dist);
+    }
+
+    public void SetRoute(Route route)
+    {
+        Route = route;
+        UpdateDestinations();
+        CalculatedV();
+        BreakBetweenJourneys = route.CalculateTotalLengthRoute() / (DvToOperation * 86.4f / 1000);
+        StartBreakingDay = -BreakBetweenJourneys + (BreakBetweenJourneys/2 * TypeShip);
+    }
+
+    private void UpdateDestinations()
+    {
+        if(destinations.Count != 0)
+        {
+            destinations.Clear();
+        }
+        for (int i = 0; i < Route.CountDestination(); i++)
+        {
+            destinations.Add(MainClass.Asteroids.GetSimAsteroid(Route.GetDestination(i).Id));
+        }
     }
 
     public void SaveData(SaveLoadShipSim save)

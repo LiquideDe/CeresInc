@@ -59,12 +59,7 @@ public class PanelStation : Spisok
 
     private void CleanList()
     {
-        for(int i=0; i<buttons.Count; i++)
-        {            
-            Destroy(buttons[i].gameObject);
-        }
-
-        buttons.Clear();
+        ClearList();
     }
 
     public void BuildStationList(List<IAsteroid> asteroids)
@@ -82,13 +77,14 @@ public class PanelStation : Spisok
 
     }
 
-    public void CreateButtons()
+    public IEnumerator CreateButtons()
     {
         BuildMiningCorpButtons("Player.Inc", null);
         for(int i = 0; i < mainClass.Corporates.CountMiningCorp(); i++)
         {
             BuildMiningCorpButtons(mainClass.Corporates.GetMiningCorporates(i).CorpName, mainClass.Corporates.GetMiningCorporates(i));
         }
+        yield return new WaitForSeconds(0.01f);
     }
     private void BuildMiningCorpButtons(string name, MiningCorporate corp)
     {

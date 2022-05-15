@@ -3,6 +3,7 @@ using System.Data;
 using Mono.Data.Sqlite;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Collections;
 
 public class DataBase
 {
@@ -14,7 +15,7 @@ public class DataBase
         mainClass = main;
     }
 
-    public void CreateDB(string path)
+    public IEnumerator CreateDB(string path)
     {
         dbConnectionString = "URI=file:" + path;
         IDbConnection dbConnection = new SqliteConnection(dbConnectionString);
@@ -52,6 +53,7 @@ public class DataBase
         dbCommand.CommandText = GenerateTextForShareTable();
         dbCommand.ExecuteNonQuery();
         dbConnection.Close();
+        yield return new WaitForSeconds(0.01f);
     }
 
     private string GenerateTextForShareTable()

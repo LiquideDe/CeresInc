@@ -120,23 +120,27 @@ public class main : MonoBehaviour
         ceres.CreateStation();
         Earth.StartGame(true);
         Earth.CalculationSeason();
-        Asteroids.CreateAsteroids(250);
+        
         market.CalculateSeason();
         Sciense.StartGame();
-        //Создаем базу данных
-
-        string path = SavePath + "Ceres.db";        
-        
-        //DB.SaveInSql();
+        StartCoroutine(CreateAsteroidsAndMining());
         gUI.StartNewGame();
         panelCreateGame.SetActive(false);
-        corporates.CreateCorporates(true);
+        
         CreatePanels();
-        dataBase.CreateDB(path);
-        PanelStation.CreateButtons();
+        
+        
 
         GameIsStarted = true;
     } 
+
+    private IEnumerator CreateAsteroidsAndMining()
+    {
+        yield return StartCoroutine(Asteroids.CreateAsteroids(250));
+        yield return StartCoroutine(corporates.CreateCorporates(true));
+        yield return StartCoroutine(dataBase.CreateDB(SavePath + "Ceres.db"));
+        yield return StartCoroutine(PanelStation.CreateButtons());
+    }
 
     public void CreatePanels()
     {

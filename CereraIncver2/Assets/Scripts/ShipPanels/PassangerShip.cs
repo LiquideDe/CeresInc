@@ -95,6 +95,9 @@ public class PassangerShip : Ship
         CargoWorkers = demandWorkers;
         CargoEquipment = demandEquip;
         CargoFood = demandFood;
+        mainClass.Ceres.WorkersAwaiting -= CargoWorkers;
+        mainClass.Player.Equipment -= CargoEquipment;
+        mainClass.Player.Food -= CargoFood;
     }
 
     public override bool ToWarehouseOrNot(int beginOrEnd)
