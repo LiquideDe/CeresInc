@@ -46,7 +46,7 @@ public class AsteroidForSimulation : Asteroid, IAsteroid
             wellbeing = 1;
         IncomeLastMonth = 100 * WorkersOnStation * ElementAbundance * wellbeing;
         ExcavatedSoil += IncomeLastMonth;
-        ElementCapacity -= IncomeLastMonth;
+        //ElementCapacity -= IncomeLastMonth;
         Element.ExcavatedAtLastMonth += IncomeLastMonth;
         CalculateSupplyConsuption();
     }

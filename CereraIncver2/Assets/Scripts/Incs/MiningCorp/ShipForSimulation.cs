@@ -94,7 +94,8 @@ public class ShipForSimulation
 
     private bool PreCalculation()
     {
-        if(LoadCargo() && CalculatedV())
+        CalcCostJourney();
+        if (LoadCargo() && CalculatedV())
         {
             CalculateDistance();
             CalculateTime();
@@ -155,14 +156,28 @@ public class ShipForSimulation
                 return false;
             }
         }
+        else
+        {
+            float sum = 0;
+            for(int i = 0; i < destinations.Count; i++)
+            {
+                destinations[i].SetReadyToLoad();
+                sum += destinations[i].ReadyToLoad;
+            }
+
+            if(sum * Corporate.OrientRes.Price < CostOfJourney)
+            {
+                StartBreakingDay += 50;
+                return false;
+            }
+        }
         return true;
     }
     private bool CalculatedV()
     {
         DV = (float)Math.Round(ISP * Math.Log((CalculateAllMass() + WeightFuel) / CalculateAllMass()), 0);
         //смотрим количество пунктов и высчитываем сколько dV мы можем использовать на каждый пункт. ѕока что поровну считаем.
-        DvToOperation = DV / ((destinations.Count + 1) * 2);
-        CalcCostJourney();
+        DvToOperation = DV / ((destinations.Count + 1) * 2);        
         if(DvToOperation > 0)
         {
             return true;
@@ -249,10 +264,8 @@ public class ShipForSimulation
             Equipment = 0;
         }
         
-        Debug.Log($" орабль {TypeShip} на маршруте {Route.Id}, –азргрузили рабочих и припасы на астероид {destinations[0].AsterName}, на астероиде теперь работает {destinations[0].WorkersOnStation} человек");
         destinations.RemoveAt(0);
         distances.RemoveAt(0);
-        Debug.Log($" орабль {TypeShip} на маршруте {Route.Id}, ќсталось точек {destinations.Count}");
         CheckLastDestination();
     }
 
