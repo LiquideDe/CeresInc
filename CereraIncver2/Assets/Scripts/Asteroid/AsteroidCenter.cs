@@ -88,6 +88,7 @@ public class AsteroidCenter : MonoBehaviour
         if(id == 249)
         {
             Debug.Log($"Расстановка завершена");
+            mainClass.PreStartIsDone();
         }
     }
 
@@ -100,8 +101,6 @@ public class AsteroidCenter : MonoBehaviour
         simAsteroids[id].ElementCapacity = asteroids[id].ElementCapacity;
         simAsteroids[id].Id = asteroids[id].Id;
         simAsteroids[id].Position = asteroids[id].Position;
-            
-               
     }
 
     public AsteroidForPlayer GetAsteroid(int id)

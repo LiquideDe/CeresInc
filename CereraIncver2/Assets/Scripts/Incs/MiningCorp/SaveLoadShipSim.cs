@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class SaveLoadShipSim
 {
-    public float food, equipment, dV, daysForTrip, startDay, cargo, weight, iSP, weightFuel, maxWeightPlayload, weightPlayload, distance, dvToOperation, costOfJourney;
-    public int workers, typeFuel, typeShip, id;
+    public float food, equipment, dV, daysForTrip, startDay, cargo, weight, iSP, weightFuel, maxWeightPlayload, weightPlayload, distance, dvToOperation, costOfJourney, startBreakingDay, breakBetweenJourneys;
+    public int workers, typeFuel, typeShip, id, routeId;
     public List<float> distances = new List<float>();
     public List<int> idDestinations = new List<int>();
     public string shipName;
-    public bool isInJourney, isLastDestination;
+    public bool isInJourney, isLastDestination, isDocking;
 }

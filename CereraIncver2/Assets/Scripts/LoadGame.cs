@@ -13,6 +13,7 @@ public class LoadGame : MonoBehaviour
     [SerializeField] private LoadSlot loadSlot;
     [SerializeField] private BuildShip buildShip;
     List<GameObject> loadCells = new List<GameObject>();
+    private bool gameIsLoaded;
 
     public void ShowLoads()
     {
@@ -81,6 +82,7 @@ public class LoadGame : MonoBehaviour
         string[] data = File.ReadAllLines(dirName);
         int row = 0;
         //1 - загружаем заголовок
+        Debug.Log($"1 - загружаем заголовок, row = {row}");
         SaveLoadmain loadmain = JsonUtility.FromJson<SaveLoadmain>(data[0]);
 
         mainClass.CeresTime = loadmain.ceresTime;
@@ -89,31 +91,55 @@ public class LoadGame : MonoBehaviour
         mainClass.SavePath = loadmain.savePath;
         mainClass.DB.RestorationDbPath(loadmain.savePath);
         row += 1;
+        yield return StartCoroutine(LoadResources(loadmain, row, data));
+    }
+
+    private IEnumerator LoadResources(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
         //2 - загружаем ресурсы
+        Debug.Log($"2 - загружаем ресурсы, row = {row}");
         for (int i = 0; i < mainClass.Materials.MaterialsCount(); i++)
         {
             SaveLoadResource loadResource = JsonUtility.FromJson<SaveLoadResource>(data[i + row]);
             mainClass.Materials.GetMaterial(i).LoadData(loadResource);
         }
         row += mainClass.Materials.MaterialsCount();
-        //3 - загружаем астероиды
-        mainClass.Asteroids.CreateAsteroids(loadmain.amountAster, false);
-        for(int i = 0; i < loadmain.amountAster; i++)
+        yield return StartCoroutine(LoadAsteroids(loadmain, row, data));
+    }
+
+    private IEnumerator LoadAsteroids(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"3 - загружаем астероиды, row = {row}");
+        StartCoroutine(mainClass.Asteroids.CreateAsteroids(loadmain.amountAster, false));
+        Debug.Log($"Количество астероидов {loadmain.amountAster}, row = {row}");
+        for (int i = 0; i < loadmain.amountAster; i++)
         {
             SaveLoadAsteroid loadAsteroid = JsonUtility.FromJson<SaveLoadAsteroid>(data[i + row]);
             mainClass.Asteroids.GetAsteroid(i).LoadData(loadAsteroid, mainClass.Materials.GetMaterial(loadAsteroid.idElement));
         }
         row += loadmain.amountAster;
+        yield return StartCoroutine(LoadSimAsteroids(loadmain, row, data));
+    }
 
-        //4 - загружаем астероиды симуляции
-        for(int i = 0; i < loadmain.amountAster; i++)
+    private IEnumerator LoadSimAsteroids(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"4 - загружаем астероиды симуляции, row = {row}");
+        for (int i = 0; i < loadmain.amountAster; i++)
         {
             SaveLoadAsteroid loadAsteroid = JsonUtility.FromJson<SaveLoadAsteroid>(data[i + row]);
             mainClass.Asteroids.GetSimAsteroid(i).LoadData(loadAsteroid, mainClass.Materials.GetMaterial(loadAsteroid.idElement));
         }
         row += loadmain.amountAster;
+        yield return StartCoroutine(LoadPlayer(loadmain, row, data));
+    }
 
-        //5 - загружаем игрока
+    private IEnumerator LoadPlayer(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"5 - загружаем игрока, row = {row}");
         SaveLoadInc loadInc = JsonUtility.FromJson<SaveLoadInc>(data[row]);
         mainClass.Player.NameInc = loadInc.nameInc;
         mainClass.Player.Money = loadInc.money;
@@ -141,21 +167,32 @@ public class LoadGame : MonoBehaviour
             mainClass.Player.PlusEngine(j, loadInc.engine[j]);
         }
         row += 1;
+        yield return StartCoroutine(LoadCorpOnEarth(loadmain, row, data));
+    }
 
-        //6 - загружаем корпорации на земле
+    private IEnumerator LoadCorpOnEarth(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"6 - загружаем корпорации на земле, row = {row}");
         mainClass.Earth.StartGame(false);
         int[] amountBuildings = new int[5];
-        for(int i=0; i<5; i++)
+        for (int i = 0; i < 5; i++)
         {
             SaveLoadEarthCorp loadEarthCorp = JsonUtility.FromJson<SaveLoadEarthCorp>(data[row + i]);
             mainClass.Earth.GetEarthCorp(i).LoadData(loadEarthCorp);
             amountBuildings[i] = loadEarthCorp.amountBuildings;
         }
         row += 5;
-        //7 - загружаем здания корпорации на земле
-        for(int i =0; i<5; i++)
+        yield return StartCoroutine(LoadBuildingsOnEarth(amountBuildings, loadmain, row, data));
+    }
+
+    private IEnumerator LoadBuildingsOnEarth(int[] amountBuildings, SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"7 - загружаем здания корпорации на земле, row = {row}");
+        for (int i = 0; i < 5; i++)
         {
-            for(int idBuild = 0; idBuild < amountBuildings[i]; idBuild++)
+            for (int idBuild = 0; idBuild < amountBuildings[i]; idBuild++)
             {
                 SaveLoadBuilding loadBuilding = JsonUtility.FromJson<SaveLoadBuilding>(data[row + idBuild]);
                 mainClass.Earth.GetEarthCorp(i).SetBuilding(loadBuilding.indexInTemplate, loadBuilding);
@@ -163,9 +200,14 @@ public class LoadGame : MonoBehaviour
             }
             row += amountBuildings[i];
         }
+        yield return StartCoroutine(LoadMiningCorp(loadmain, row, data));
+    }
 
-        //8 - загружаем добывающие компании        
-        mainClass.Corporates.CreateCorporates(false);
+    private IEnumerator LoadMiningCorp(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"8 - загружаем добывающие компании, row = {row}");
+        StartCoroutine(mainClass.Corporates.CreateCorporates(false));
         int[] amountShipsAtMiningCorp = new int[mainClass.Corporates.CountMiningCorp()];
         for (int i = 0; i < mainClass.Corporates.CountMiningCorp(); i++)
         {
@@ -174,55 +216,115 @@ public class LoadGame : MonoBehaviour
             amountShipsAtMiningCorp[i] = loadMiningCorp.ships;
         }
         row += mainClass.Corporates.CountMiningCorp();
+        yield return StartCoroutine(LoadPlayersRoutes(amountShipsAtMiningCorp, loadmain, row, data));
+    }
 
-        //9 - загружаем корабли игрока
-        for(int i = 0; i < loadmain.playerShips; i++)
+    private IEnumerator LoadPlayersRoutes(int[] amountShipsAtMiningCorp, SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"9 - загружаем маршруты игрока, row = {row}");
+        ShipRoutes shipRoutes = mainClass.PanelShip.ShipRoutes;
+        shipRoutes.CreateEmptyRoutes(loadmain.amountPlayerRoutes);
+        for (int i = 0; i < loadmain.amountPlayerRoutes; i++)
+        {
+            SaveLoadRoute loadRoute = JsonUtility.FromJson<SaveLoadRoute>(data[row + i]);
+            shipRoutes.GetRoute(i).LoadData(loadRoute, true);
+        }
+        row += loadmain.amountPlayerRoutes;
+        yield return StartCoroutine(LoadMiningCorpsRoutes(amountShipsAtMiningCorp, loadmain, row, data));
+    }
+
+    private IEnumerator LoadMiningCorpsRoutes(int[] amountShipsAtMiningCorp, SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"10 - загружаем маршруты компаний, row = {row}");
+        for (int corp = 0; corp < mainClass.Corporates.CountMiningCorp(); corp++)
+        {
+            ShipDepartment shipDepartment = mainClass.Corporates.GetMiningCorporates(corp).ShipDepartment;
+            shipDepartment.CreateEmptyRoute(shipDepartment.Corporate.AmountRoutes);
+            for (int route = 0; route < shipDepartment.Corporate.AmountRoutes; route++)
+            {
+                SaveLoadRoute loadRoute = JsonUtility.FromJson<SaveLoadRoute>(data[row + route]);
+                shipDepartment.GetRoute(route).LoadData(loadRoute, false);
+            }
+            row += shipDepartment.Corporate.AmountRoutes;
+        }
+        yield return StartCoroutine(LoadPlayersShips(amountShipsAtMiningCorp, loadmain, row, data));
+    }
+
+    private IEnumerator LoadPlayersShips(int[] amountShipsAtMiningCorp, SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"11 - загружаем корабли игрока, их {loadmain.playerShips}, row = {row}");
+        for (int i = 0; i < loadmain.playerShips; i++)
         {
             SaveLoadShip loadShip = JsonUtility.FromJson<SaveLoadShip>(data[row + i]);
             buildShip.BuildEmptyShip(loadShip.typeShip, loadShip);
         }
         row += loadmain.playerShips;
+        yield return StartCoroutine(LoadMiningCorpsShips(amountShipsAtMiningCorp, loadmain, row, data));
+    }
 
-        //10 - загружаем корабли корпораций
-        for(int corp = 0; corp < mainClass.Corporates.CountMiningCorp(); corp++)
+    private IEnumerator LoadMiningCorpsShips(int[] amountShipsAtMiningCorp, SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"12 - загружаем корабли корпораций, корпораций всего {mainClass.Corporates.CountMiningCorp()}, row = {row}");
+        for (int corp = 0; corp < mainClass.Corporates.CountMiningCorp(); corp++)
         {
+            Debug.Log($"Смотрим {corp} корпорацию, кораблей у нее {amountShipsAtMiningCorp[corp]}");
             for (int j = 0; j < amountShipsAtMiningCorp[corp]; j++)
             {
                 SaveLoadShipSim loadShipSim = JsonUtility.FromJson<SaveLoadShipSim>(data[row + j]);
                 mainClass.Corporates.GetMiningCorporates(corp).ShipDepartment.CreateEmptyShip(loadShipSim);
             }
+            Debug.Log($"row {row} += {amountShipsAtMiningCorp[corp]}");
             row += amountShipsAtMiningCorp[corp];
         }
+        yield return StartCoroutine(LoadPlayersSciense(loadmain, row, data));
+    }
 
-        //11 - загружаем науку игрока
+    private IEnumerator LoadPlayersSciense(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"13 - загружаем науку игрока, row = {row}");
         SaveLoadSciense loadSciense = JsonUtility.FromJson<SaveLoadSciense>(data[row]);
         mainClass.Sciense.LoadData(loadSciense);
         row += 1;
+        yield return StartCoroutine(LoadMiningCorpsSciense(loadmain, row, data));
+    }
 
-        //12 - загружаем науку корпораций
-        for(int corp = 0; corp < mainClass.Corporates.CountMiningCorp(); corp++)
+    private IEnumerator LoadMiningCorpsSciense(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"14 - загружаем науку корпораций, row = {row}");
+        for (int corp = 0; corp < mainClass.Corporates.CountMiningCorp(); corp++)
         {
-            loadSciense = JsonUtility.FromJson<SaveLoadSciense>(data[row + corp]);
+            SaveLoadSciense loadSciense = JsonUtility.FromJson<SaveLoadSciense>(data[row + corp]);
             mainClass.Corporates.GetMiningCorporates(corp).ScienseDepartment.LoadData(loadSciense);
         }
         row += mainClass.Corporates.CountMiningCorp();
+        yield return StartCoroutine(LoadPlayersTechs(loadmain, row, data));
+    }
 
-        //13 - загружаем технологии игрока
-        for(int i = 0; i < mainClass.Sciense.CountCarcass(); i++)
+    private IEnumerator LoadPlayersTechs(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"15 - загружаем технологии игрока, row = {row}");
+        for (int i = 0; i < mainClass.Sciense.CountCarcass(); i++)
         {
             SaveLoadTechnology loadTechnology = JsonUtility.FromJson<SaveLoadTechnology>(data[row + i]);
             mainClass.Sciense.GetCarcass(i).LoadData(loadTechnology);
         }
         row += mainClass.Sciense.CountCarcass();
 
-        for(int i = 0; i < mainClass.Sciense.CountFuelTank(); i++)
+        for (int i = 0; i < mainClass.Sciense.CountFuelTank(); i++)
         {
             SaveLoadTechnology loadTechnology = JsonUtility.FromJson<SaveLoadTechnology>(data[row + i]);
             mainClass.Sciense.GetFuelTank(i).LoadData(loadTechnology);
         }
         row += mainClass.Sciense.CountFuelTank();
 
-        for(int i = 0; i < mainClass.Sciense.CountEngine(); i++)
+        for (int i = 0; i < mainClass.Sciense.CountEngine(); i++)
         {
             SaveLoadTechnology loadTechnology = JsonUtility.FromJson<SaveLoadTechnology>(data[row + i]);
             mainClass.Sciense.GetEngine(i).LoadData(loadTechnology);
@@ -237,11 +339,16 @@ public class LoadGame : MonoBehaviour
         row += mainClass.Sciense.CountResTech();
 
         mainClass.Sciense.PutInListAndButton();
+        yield return StartCoroutine(LoadMiningCorpsTechs(loadmain, row, data));
+    }
 
-        //14 - загружаем технологии корпораций
-        for(int corp = 0; corp < mainClass.Corporates.CountMiningCorp(); corp++)
+    private IEnumerator LoadMiningCorpsTechs(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"16 - загружаем технологии корпораций, row = {row}");
+        for (int corp = 0; corp < mainClass.Corporates.CountMiningCorp(); corp++)
         {
-            for(int tech = 0; tech < mainClass.Corporates.GetMiningCorporates(corp).ScienseDepartment.CountCarcass(); tech++)
+            for (int tech = 0; tech < mainClass.Corporates.GetMiningCorporates(corp).ScienseDepartment.CountCarcass(); tech++)
             {
                 SaveLoadTechnology loadTechnology = JsonUtility.FromJson<SaveLoadTechnology>(data[row + tech]);
                 mainClass.Corporates.GetMiningCorporates(corp).ScienseDepartment.GetCarcass(tech).LoadData(loadTechnology);
@@ -270,38 +377,63 @@ public class LoadGame : MonoBehaviour
             row += mainClass.Corporates.GetMiningCorporates(corp).ScienseDepartment.CountResTech();
             mainClass.Corporates.GetMiningCorporates(corp).ScienseDepartment.PutInListAndButton();
         }
+        yield return StartCoroutine(LoadOrders(loadmain, row, data));
+    }
 
-        //15 - загружаем заказы
-        for(int i = 0; i < 3; i++)
+    private IEnumerator LoadOrders(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"17 - загружаем заказы, row = {row}");
+        for (int i = 0; i < 3; i++)
         {
             SaveLoadOrder loadOrder = JsonUtility.FromJson<SaveLoadOrder>(data[row + i]);
             mainClass.PanelOrder.GetOrder(i).LoadData(loadOrder);
         }
         row += 3;
+        yield return StartCoroutine(LoadEarth(loadmain, row, data));
+    }
 
-        //16 - загружаем землю
+    private IEnumerator LoadEarth(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"18 - загружаем землю, row = {row}");
         SaveLoadEarth loadEarth = JsonUtility.FromJson<SaveLoadEarth>(data[row]);
         mainClass.Earth.LoadData(loadEarth);
         row += 1;
+        yield return StartCoroutine(LoadCeresBase(loadmain, row, data));
+    }
 
-        //17 загружаем параметры основной станции
+    private IEnumerator LoadCeresBase(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"19 загружаем параметры основной станции, row = {row}");
         SaveLoadCeres saveLoadCeres = JsonUtility.FromJson<SaveLoadCeres>(data[row]);
         mainClass.Ceres.CreateStation();
         mainClass.Ceres.LoadData(saveLoadCeres);
-        
         row += 1;
+        yield return StartCoroutine(LoadModulesParametr(loadmain, row, data));
+    }
 
-        //18 - загружаем параметры модулей
-        for(int i=0; i < mainClass.Ceres.CountModules(); i++)
+    private IEnumerator LoadModulesParametr(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"20 - загружаем параметры модулей, row = {row}");
+        for (int i = 0; i < mainClass.Ceres.CountModules(); i++)
         {
             SaveLoadStationModule loadStationModule = JsonUtility.FromJson<SaveLoadStationModule>(data[row + i]);
             mainClass.Ceres.GetSpaceModule(i).LoadData(loadStationModule);
         }
+        yield return StartCoroutine(LoadAnothers());
+    }
 
+    private IEnumerator LoadAnothers()
+    {
+        yield return new WaitForEndOfFrame();
         panelLoadGame.SetActive(false);
         mainClass.CreatePanels();
         mainClass.PanelStation.CreateButtons();
+        mainClass.HelloPanel.SetActive(false);
         mainClass.GameIsStarted = true;
-        mainClass.HelloPanel.SetActive(false);  
+        yield return new WaitForEndOfFrame();
     }
 }

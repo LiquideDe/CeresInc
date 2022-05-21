@@ -4,12 +4,17 @@ using UnityEngine;
 
 public class Route
 {
+    public main MainClass { get; set; }
     private List<IAsteroid> destinations = new List<IAsteroid>();
     public string NameRoute { get; set; }
     public float Distance { get; set; }
     public int AmountShipsOnRoute { get; set; }
     public int Id { get; set; }
 
+    public Route(main main)
+    {
+        MainClass = main;
+    }
     public IAsteroid GetDestination(int id)
     {
         return destinations[id];
@@ -63,5 +68,43 @@ public class Route
         }
         
         return totalLength;
+    }
+
+    public void SaveData(SaveLoadRoute save)
+    {
+        Debug.Log($"Сохраняем параметры пути");
+        save.nameRoute = NameRoute;
+        save.distance = Distance;
+        save.id = Id;
+        save.amountShipsOnRoute = AmountShipsOnRoute;
+
+        for(int i = 0; i < destinations.Count; i++)
+        {
+            save.idDestinations.Add(destinations[i].Id);
+        }
+    }
+
+    public void LoadData(SaveLoadRoute save, bool isPlayers)
+    {
+        NameRoute = save.nameRoute;
+        Distance = save.distance;
+        Id = save.id;
+        AmountShipsOnRoute = save.amountShipsOnRoute;
+
+        if (isPlayers)
+        {
+            for (int i = 0; i < save.idDestinations.Count; i++)
+            {
+                destinations.Add(MainClass.Asteroids.GetAsteroid(save.idDestinations[i]));
+            }
+        }
+        else
+        {
+            for (int i = 0; i < save.idDestinations.Count; i++)
+            {
+                destinations.Add(MainClass.Asteroids.GetSimAsteroid(save.idDestinations[i]));
+            }
+        }
+        
     }
 }

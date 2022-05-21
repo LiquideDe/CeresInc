@@ -78,8 +78,12 @@ public class ScienseForPlayer : Sciense
 
     protected override void LoadAnotherData(SaveLoadSciense save)
     {
+        Debug.Log($"Загружаем карточки, количество карточек сохраненных {save.sliders.Count}");
         for (int i = 0; i < 4; i++)
         {
+            Debug.Log($"Загружаем слайдер {i}");
+            Debug.Log($"Сейчас у техбата {techButs[i].sliderCost.value}");
+            Debug.Log($"А в сохраненках {save.sliders[i]}");
             techButs[i].sliderCost.value = save.sliders[i];
         }
     }

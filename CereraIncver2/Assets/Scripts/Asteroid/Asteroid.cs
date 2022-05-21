@@ -22,9 +22,9 @@ public abstract class Asteroid : MonoBehaviour
         save.idElement = Element.Id;
         save.elementCapacity = ElementCapacity;
         save.id = Id;
-        save.posX = transform.position.x;
-        save.posY = transform.position.y;
-        save.posZ = transform.position.z;
+        save.posX = Position.x;
+        save.posY = Position.y;
+        save.posZ = Position.z;
         save.hasMiningStation = HasMiningStation;
         save.distance = Distance;
 

@@ -7,9 +7,9 @@ public class SaveLoadShip
     public int isp, typeFuel, typeShip, age, id;
     public string shipName;
 
-    public float timeToJourney, dV, distance, distanceToNear, dvToOperation;
+    public float timeToJourney, dV, distance, distanceToNear, dvToOperation, breakBetweenJourneys, startBreakingDay;
     public bool isInJourney, isDocked, isTimeForDockingEnd, lastDestination, repeat, isStartAllowed, isToWarehouse, isDockedToWarehouse;
-    public int daysForDocking;
+    public int daysForDocking, idRoute;
     public List<int> idDestinations = new List<int>();
     public List<int> idOldDestinations = new List<int>();
 

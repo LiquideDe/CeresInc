@@ -12,6 +12,7 @@ public class main : MonoBehaviour
     [SerializeField] private Text moneyText;
     [SerializeField] private InputField gameName;
     [SerializeField] private Button buttonX1, buttonX2, buttonX3, buttonPause;
+    [SerializeField] private GameObject mainLogo;
 
     private Button prevBut, prevButBeforePause;
     public GameObject HelloPanel { get { return helloPanel; } }
@@ -111,6 +112,7 @@ public class main : MonoBehaviour
     
     public void StartNewGame()
     {
+        mainLogo.SetActive(true);
         prevButBeforePause = buttonX1;
         dayBeforeArrival = 460;        
         Player.PlusCarcassPas(0, 1);
@@ -128,10 +130,6 @@ public class main : MonoBehaviour
         panelCreateGame.SetActive(false);
         
         CreatePanels();
-        
-        
-
-        GameIsStarted = true;
     } 
 
     private IEnumerator CreateAsteroidsAndMining()
@@ -151,6 +149,12 @@ public class main : MonoBehaviour
         resPanel.UpdateText(5, $"{Ceres.FreeEnergy}");
 
         panelWithElements.CreateList();
+    }
+
+    public void PreStartIsDone()
+    {
+        GameIsStarted = true;
+        mainLogo.SetActive(false);
     }
 
     // Update is called once per frame

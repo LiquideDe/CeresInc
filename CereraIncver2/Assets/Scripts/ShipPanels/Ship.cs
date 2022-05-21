@@ -162,6 +162,9 @@ public abstract class Ship : MonoBehaviour
         save.daysForDocking = Navigator.DaysForDocking;
         save.shipName = ShipName;
         save.distanceForAcc = Steersman.DistanceForAcc;
+        save.idRoute = Navigator.IdRoute;
+        save.breakBetweenJourneys = Navigator.BreakBetweenJourneys;
+        save.startBreakingDay = Navigator.StartBreakingDay;
         for (int j = 0; j < Navigator.DestinationsCount(); j++)
         {
             save.idDestinations.Add(Navigator.GetDestination(j).Asteroid.Id);
@@ -217,6 +220,9 @@ public abstract class Ship : MonoBehaviour
         Navigator.DaysForDocking = save.daysForDocking;
         ShipName = save.shipName;
         Steersman.DistanceForAcc = save.distanceForAcc;
+        Navigator.IdRoute = save.idRoute;
+        Navigator.BreakBetweenJourneys = save.breakBetweenJourneys;
+        Navigator.StartBreakingDay = save.startBreakingDay;
 
         for (int j = 0; j < save.idDestinations.Count; j++)
         {

@@ -16,8 +16,8 @@ public class MiningCorporate : Corporate, ICorporateShare
     public float AmountResource { get; set; }
     public float PriceShare { get { return FinanceDepartment.PriceShare; } }
     public float Price { get; set; }
-    public float AmountShip { get; set; }
-    public bool NoMoreAsteroids { get; set; }
+    public int AmountShip { get; set; }
+    public int AmountRoutes { get; set; }
     public bool IsRoutesCreate { get; set; }
     public bool IsNeedComponentsForNewShips { get; set; }
 
@@ -27,6 +27,8 @@ public class MiningCorporate : Corporate, ICorporateShare
     private List<int> fuelTank = new List<int>();
     [SerializeField] ScienseForSimulation sciense;
     [SerializeField] CorpPanel corpPanel;
+    public int ships;
+    public int routes;
 
     public CorpPanel ShareMarket { get { return corpPanel; } }
 
@@ -34,7 +36,8 @@ public class MiningCorporate : Corporate, ICorporateShare
     {
         MiningDepartment = new MiningDepartment(this);
         ShipDepartment = new ShipDepartment(this);
-        FinanceDepartment = new FinanceDepartment(this);        
+        FinanceDepartment = new FinanceDepartment(this);
+        Debug.Log($"Создали новые подразделения");
     }
 
     public void StartNewGame()
@@ -245,6 +248,10 @@ public class MiningCorporate : Corporate, ICorporateShare
         {            
             ShipDepartment.ShipWorking();
         }
+
+        //Debug.Log($"Количество кораблей {ShipDepartment.CountShips()}");
+        ships = ShipDepartment.CountShips();
+        routes = ShipDepartment.CountRoutes();
     }
 
     public void SaveData(SaveLoadMiningCorp save)
@@ -260,18 +267,22 @@ public class MiningCorporate : Corporate, ICorporateShare
         save.price = Price;
         save.amountShare = FinanceDepartment.AmountShare;
         save.money = Money;
+        save.isConstructShip = ShipDepartment.IsConstructShip;
+        save.amountRoutes = ShipDepartment.CountRoutes();
+        save.isRoutesCreate = IsRoutesCreate;
+        save.isNeedComponentsForNewShips = IsNeedComponentsForNewShips;
 
-        CopyDateFromFirstArrayToSecond(carcassPas, save.carcassPas);
-        CopyDateFromFirstArrayToSecond(carcassCargo, save.carcassCargo);
-        CopyDateFromFirstArrayToSecond(fuelTank, save.fuelTank);
-        CopyDateFromFirstArrayToSecond(engine, save.engine);
+        CopyDataFromFirstArrayToSecond(carcassPas, save.carcassPas);
+        CopyDataFromFirstArrayToSecond(carcassCargo, save.carcassCargo);
+        CopyDataFromFirstArrayToSecond(fuelTank, save.fuelTank);
+        CopyDataFromFirstArrayToSecond(engine, save.engine);
 
         for (int j = 0; j < MiningDepartment.CountAsteroids(); j++)
         {
             save.asteroids.Add(MiningDepartment.GetAsteroid(j).Id);
         }
     }
-    private void CopyDateFromFirstArrayToSecond(List<int> firstArray, List<int> secondArray)
+    private void CopyDataFromFirstArrayToSecond(List<int> firstArray, List<int> secondArray)
     {
         for (int i = 0; i < firstArray.Count; i++)
         {
@@ -291,11 +302,16 @@ public class MiningCorporate : Corporate, ICorporateShare
         Price = save.price;
         FinanceDepartment.AmountShare = save.amountShare;
         Money = save.money;
+        AmountShip = save.ships;
+        ShipDepartment.IsConstructShip = save.isConstructShip;
+        AmountRoutes = save.amountRoutes;
+        IsRoutesCreate = save.isRoutesCreate;
+        IsNeedComponentsForNewShips = save.isNeedComponentsForNewShips;
 
-        CopyDateFromFirstArrayToSecond(save.carcassPas, carcassPas);
-        CopyDateFromFirstArrayToSecond(save.carcassCargo, carcassCargo);
-        CopyDateFromFirstArrayToSecond(save.fuelTank, fuelTank);
-        CopyDateFromFirstArrayToSecond(save.engine, engine);
+        CopyDataFromFirstArrayToSecond(save.carcassPas, carcassPas);
+        CopyDataFromFirstArrayToSecond(save.carcassCargo, carcassCargo);
+        CopyDataFromFirstArrayToSecond(save.fuelTank, fuelTank);
+        CopyDataFromFirstArrayToSecond(save.engine, engine);
 
         for (int j = 0; j < save.asteroids.Count; j++)
         {

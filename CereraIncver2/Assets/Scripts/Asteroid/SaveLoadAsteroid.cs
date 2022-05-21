@@ -10,5 +10,6 @@ public class SaveLoadAsteroid
 
     public float excavatedSoil, food, equipment, equipmentPlanned, incomeLastMonth, amountReadyForLoading;
     public int workersOnStation, awaitingWorkers, workersPlanned, foodPlanned;
+    public bool isInRoute;
 
 }

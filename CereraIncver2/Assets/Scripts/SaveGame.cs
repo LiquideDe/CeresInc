@@ -18,6 +18,7 @@ public class SaveGame : Spisok
         List<string> data = new List<string>();
 
         //1 - создаем сохранение общих данных. количество астероидов, кораблей, технологий, дней.
+        Debug.Log($"1 - создаем сохранение общих данных. количество астероидов, кораблей, технологий, дней.");
         SaveLoadmain saveLoadmain = new SaveLoadmain();
         saveLoadmain.amountAster = mainClass.Asteroids.AsteroidsCount();
         saveLoadmain.ceresTime = mainClass.CeresTime;
@@ -26,9 +27,11 @@ public class SaveGame : Spisok
         saveLoadmain.savePath = mainClass.SavePath;
         saveLoadmain.playerShips = mainClass.PanelShip.ShipCount();
         saveLoadmain.money = mainClass.Player.Money;
+        saveLoadmain.amountPlayerRoutes = mainClass.PanelShip.ShipRoutes.CountRoutes();
 
         data.Add(JsonUtility.ToJson(saveLoadmain));
         //2 - Сохраняем ресурсы
+        Debug.Log($"2 - Сохраняем ресурсы");
         List<SaveLoadResource> saveLoadResources = new List<SaveLoadResource>();
         for(int i = 0; i < mainClass.Materials.MaterialsCount(); i++)
         {
@@ -39,6 +42,7 @@ public class SaveGame : Spisok
         }
 
         //3 - Сохраняем астероиды
+        Debug.Log($"3 - Сохраняем астероиды");
         int amountAster = mainClass.Asteroids.AsteroidsCount();
         List<SaveLoadAsteroid> saveLoadAsteroids = new List<SaveLoadAsteroid>();
         for(int i = 0; i < amountAster; i++)
@@ -49,7 +53,8 @@ public class SaveGame : Spisok
             data.Add(JsonUtility.ToJson(saveLoadAsteroids[i]));
         }
 
-        //4 - Сохраняем астероиды для симуляции        
+        //4 - Сохраняем астероиды для симуляции
+        Debug.Log($"4 - Сохраняем астероиды для симуляции");
         for (int i= 0; i< amountAster; i++)
         {
             saveLoadAsteroids.Add(new SaveLoadAsteroid());
@@ -59,6 +64,7 @@ public class SaveGame : Spisok
         }
 
         //5 - Сохраняем игрока
+        Debug.Log($"5 - Сохраняем игрока");
         SaveLoadInc saveLoadInc = new SaveLoadInc();
 
         saveLoadInc.nameInc = mainClass.Player.NameInc;
@@ -93,6 +99,7 @@ public class SaveGame : Spisok
         data.Add(JsonUtility.ToJson(saveLoadInc));
 
         //6 - Сохраняем корпорации на земле
+        Debug.Log($"6 - Сохраняем корпорации на земле");
         List<SaveLoadEarthCorp> saveLoadEarthCorps = new List<SaveLoadEarthCorp>();
         for(int i =0; i < 5; i++)
         {
@@ -103,6 +110,7 @@ public class SaveGame : Spisok
         }
 
         //7 - Сохраняем здания корпораций на земле
+        Debug.Log($"7 - Сохраняем здания корпораций на земле");
         List<SaveLoadBuilding> saveLoadBuildings = new List<SaveLoadBuilding>();
         for(int i=0; i < 5; i++)
         {
@@ -117,6 +125,7 @@ public class SaveGame : Spisok
         }
 
         //8 - Сохраняем добывающие корпорации
+        Debug.Log($"8 - Сохраняем добывающие корпорации");
         List<SaveLoadMiningCorp> saveLoadMiningCorps = new List<SaveLoadMiningCorp>();
         for(int i = 0; i < mainClass.Corporates.CountMiningCorp(); i++)
         {
@@ -126,7 +135,36 @@ public class SaveGame : Spisok
             data.Add(JsonUtility.ToJson(saveLoadMiningCorps[i]));
         }
 
-        //9 - Сохраняем корабли игрока
+        //9 - Сохраняем маршруты игрока
+        Debug.Log($"9 - Сохраняем маршруты игрока");
+        List<SaveLoadRoute> saveLoadPlayerRoutes = new List<SaveLoadRoute>();
+        for(int i = 0; i < saveLoadmain.amountPlayerRoutes; i++)
+        {
+            saveLoadPlayerRoutes.Add(new SaveLoadRoute());
+            mainClass.PanelShip.ShipRoutes.GetRoute(i).SaveData(saveLoadPlayerRoutes[i]);
+
+            data.Add(JsonUtility.ToJson(saveLoadPlayerRoutes[i]));
+        }
+
+        //10 - Сохраняем маршруты корпораций
+        Debug.Log($"10 - Сохраняем маршруты корпораций");
+        List<SaveLoadRoute> saveLoadRoutes = new List<SaveLoadRoute>();
+        for( int corp = 0; corp < mainClass.Corporates.CountMiningCorp(); corp++)
+        {
+            Debug.Log($"Сохраняем для {corp} корпорации");
+            ShipDepartment shipDepartment = mainClass.Corporates.GetMiningCorporates(corp).ShipDepartment;
+            Debug.Log($"Количество путей {shipDepartment.CountRoutes()}");
+            for (int idRoute = 0; idRoute < shipDepartment.CountRoutes(); idRoute++)
+            {
+                saveLoadRoutes.Add(new SaveLoadRoute());
+                shipDepartment.GetRoute(idRoute).SaveData(saveLoadRoutes[idRoute + corp]);
+
+                data.Add(JsonUtility.ToJson(saveLoadRoutes[idRoute + corp]));
+            }
+        }
+
+        //11 - Сохраняем корабли игрока
+        Debug.Log($"11 - Сохраняем корабли игрока");
         List<SaveLoadShip> saveLoadShips = new List<SaveLoadShip>();
         for(int i = 0; i < mainClass.PanelShip.ShipCount(); i++)
         {
@@ -137,26 +175,35 @@ public class SaveGame : Spisok
             data.Add(JsonUtility.ToJson(saveLoadShips[i]));
         }
 
-        //10 - Сохраняем корабли добывающих компаний
+        //12 - Сохраняем корабли добывающих компаний
+        Debug.Log($"12 - Сохраняем корабли добывающих компаний");
         List<SaveLoadShipSim> saveLoadShipSims = new List<SaveLoadShipSim>();
         for(int idCorp = 0; idCorp < mainClass.Corporates.CountMiningCorp(); idCorp++)
         {
-            for(int idShip = 0; idShip < mainClass.Corporates.GetMiningCorporates(idCorp).AmountShip; idShip++)
+            Debug.Log($"Корпорация {idCorp}");
+            for(int idShip = 0; idShip < mainClass.Corporates.GetMiningCorporates(idCorp).ShipDepartment.CountShips(); idShip++)
             {
+                Debug.Log($"Создаем новый севлоад");
                 saveLoadShipSims.Add(new SaveLoadShipSim());
-                mainClass.Corporates.GetMiningCorporates(idCorp).ShipDepartment.GetShip(idShip).SaveData(saveLoadShipSims[idShip]);
-                
+                Debug.Log($"Отправляем его в корабль");
+                Debug.Log($"Зовут корпорацию {mainClass.Corporates.GetMiningCorporates(idCorp).CorpName}, Всего кораблей у корпорации {mainClass.Corporates.GetMiningCorporates(idCorp).ShipDepartment.CountShips()}, другая версия, что кораблей {mainClass.Corporates.GetMiningCorporates(idCorp).AmountShip}");
+                Debug.Log($"Имя корабля {mainClass.Corporates.GetMiningCorporates(idCorp).ShipDepartment.GetShip(idShip).ShipName}, тип корабля {mainClass.Corporates.GetMiningCorporates(idCorp).ShipDepartment.GetShip(idShip).TypeShip}");
+                mainClass.Corporates.GetMiningCorporates(idCorp).ShipDepartment.GetShip(idShip).SaveData(saveLoadShipSims[idShip + idCorp]);
+                Debug.Log($"Сохраняем в джейсон");
                 data.Add(JsonUtility.ToJson(saveLoadShipSims[idCorp + idShip]));
+                Debug.Log($"Сохранили");
             }            
         }
 
-        //11 - сохраняем науку игрока
+        //13 - сохраняем науку игрока
+        Debug.Log($"13 - сохраняем науку игрока");
         SaveLoadSciense saveLoadSciense = new SaveLoadSciense();
         mainClass.Sciense.SaveData(saveLoadSciense);
 
         data.Add(JsonUtility.ToJson(saveLoadSciense));
 
-        //12 - сохраняем науку корпораций
+        //14 - сохраняем науку корпораций
+        Debug.Log($"14 - сохраняем науку корпораций");
         List<SaveLoadSciense> saveLoadScienseList = new List<SaveLoadSciense>();
         for(int corp = 0; corp < mainClass.Corporates.CountMiningCorp(); corp++)
         {
@@ -166,7 +213,8 @@ public class SaveGame : Spisok
             data.Add(JsonUtility.ToJson(saveLoadScienseList[corp]));
         }
 
-        //13 - сохраняем технологии игрока
+        //15 - сохраняем технологии игрока
+        Debug.Log($"15 - сохраняем технологии игрока");
         List<SaveLoadTechnology> saveLoadTechnologies = new List<SaveLoadTechnology>();
         int amountTech = 0;
         for(int i = 0; i < mainClass.Sciense.CountCarcass(); i++)
@@ -205,7 +253,8 @@ public class SaveGame : Spisok
         }
         amountTech += mainClass.Sciense.CountResTech();
 
-        //14 - сохраняем технологии корпораций
+        //16 - сохраняем технологии корпораций
+        Debug.Log($"16 - сохраняем технологии корпораций");
         int amountMinTech = 0;
         int allAmount;
         for(int corp = 0; corp < mainClass.Corporates.CountMiningCorp(); corp++)
@@ -251,7 +300,8 @@ public class SaveGame : Spisok
             amountMinTech += mainClass.Corporates.GetMiningCorporates(corp).ScienseDepartment.CountResTech();
         }
 
-        //15 - сохраняем заказы
+        //17 - сохраняем заказы
+        Debug.Log($"17 - сохраняем заказы");
         List<SaveLoadOrder> saveLoadOrders = new List<SaveLoadOrder>();
         for (int i = 0; i < 3; i++)
         {
@@ -261,18 +311,21 @@ public class SaveGame : Spisok
             data.Add(JsonUtility.ToJson(saveLoadOrders[i]));
         }
 
-        //16 - сохраняем землю
+        //18 - сохраняем землю
+        Debug.Log($"18 - сохраняем землю");
         SaveLoadEarth saveLoadEarths = new SaveLoadEarth();
         mainClass.Earth.SaveData(saveLoadEarths);
         data.Add(JsonUtility.ToJson(saveLoadEarths));
 
-        //17 - сохраняем параметры основной станции
+        //19 - сохраняем параметры основной станции
+        Debug.Log($"19 - сохраняем параметры основной станции");
         SaveLoadCeres saveLoadCeres = new SaveLoadCeres();
         mainClass.Ceres.SaveData(saveLoadCeres);
 
         data.Add(JsonUtility.ToJson(saveLoadCeres));
 
-        //18 - сохраняем параметры модулей
+        //20 - сохраняем параметры модулей
+        Debug.Log($"20 - сохраняем параметры модулей");
         List<SaveLoadStationModule> saveLoadStationModules = new List<SaveLoadStationModule>();
         for(int i=0; i < mainClass.Ceres.CountModules(); i++)
         {

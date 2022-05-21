@@ -51,12 +51,21 @@ public class ShipRoutes : Spisok
 
     public void CreateNewRoute()
     {
-        routes.Add(new Route());
+        routes.Add(new Route(mainClass));
         createRoute = true;
         route = routes[routes.Count - 1];
         route.Id = routes.Count - 1;
         listRoutes.Create_Button(route.Id);
         textName.text = "";
+    }
+
+    public void CreateEmptyRoutes(int amount)
+    {
+        for(int  i = 0; i < amount; i++)
+        {
+            routes.Add(new Route(mainClass));
+            listRoutes.Create_Button(i);
+        }        
     }
 
     public void CloseCreateRoute()

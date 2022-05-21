@@ -13,21 +13,14 @@ public class Corporates : MonoBehaviour
     public IEnumerator CreateCorporates(bool isNewGame)
     {
         
-        for(int i=0;i<1; i++)
+        for(int i = 0;i < mainClass.Materials.MaterialsCount() - 1; i++)
         {
             CreateMiningCorporate(mainClass.Materials.GetMaterial(i), isNewGame);
         }
         Debug.Log($"Корпорации создали");
         yield return new WaitForSeconds(0.01f);
     }
-    public MiningCorporate GetMiningCorporates(int id)
-    {
-        return miningCorporates[id];
-    }
-    public int CountMiningCorp()
-    {
-        return miningCorporates.Count;
-    }
+    
 
     private void CreateMiningCorporate(Resource element, bool isNewGame)
     {
@@ -60,5 +53,13 @@ public class Corporates : MonoBehaviour
         {
             miningCorporates[i].Arrival();
         }
+    }
+    public MiningCorporate GetMiningCorporates(int id)
+    {
+        return miningCorporates[id];
+    }
+    public int CountMiningCorp()
+    {
+        return miningCorporates.Count;
     }
 }

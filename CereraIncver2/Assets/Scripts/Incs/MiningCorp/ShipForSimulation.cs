@@ -35,6 +35,12 @@ public class ShipForSimulation
     public float BreakBetweenJourneys { get; set; }
     public bool IsDocking { get; set; }
 
+    public ShipForSimulation(main main, MiningCorporate corporate)
+    {
+        MainClass = main;
+        Corporate = corporate;
+    }
+
     public void AtWork()
     {
         if (IsInJourney)
@@ -316,7 +322,7 @@ public class ShipForSimulation
         Route = route;
         UpdateDestinations();
         CalculatedV();
-        BreakBetweenJourneys = route.CalculateTotalLengthRoute() / (DvToOperation * 86.4f / 1000);
+        BreakBetweenJourneys = (route.CalculateTotalLengthRoute() / (DvToOperation * 86.4f / 1000))/2;
         StartBreakingDay = -BreakBetweenJourneys + (BreakBetweenJourneys/2 * TypeShip);
     }
 
@@ -334,6 +340,7 @@ public class ShipForSimulation
 
     public void SaveData(SaveLoadShipSim save)
     {
+        Debug.Log($"Начинаем процесс сохранения");
         save.food = Food;
         save.equipment = Equipment;
         save.dV = DV;
@@ -355,20 +362,30 @@ public class ShipForSimulation
         save.shipName = ShipName;
         save.isInJourney = IsInJourney;
         save.isLastDestination = IsLastDestination;
+        save.routeId = Route.Id;
+        save.startBreakingDay = StartBreakingDay;
+        save.breakBetweenJourneys = BreakBetweenJourneys;
+        save.isDocking = IsDocking;
 
-        for (int i = 0; i < CountDestination(); i++)
+        Debug.Log($"Количество пунктов {CountDestination()}");
+        for (int i = 0; i < distances.Count; i++)
         {
             save.distances.Add(GetDistance(i));
         }
-
+        Debug.Log($"Количество пунктов {CountDestination()}");
         for (int i = 0; i < CountDestination(); i++)
         {
+            Debug.Log($"пункт {i}");
+            Debug.Log($"id пункта {GetDestination(i).Id}");
             save.idDestinations.Add(GetDestination(i).Id);
+            Debug.Log($"добавили");
         }
+        Debug.Log($"Из цикла вышли");
     }
 
     public void LoadData(SaveLoadShipSim save)
     {
+        
         Food = save.food;
         Equipment = save.equipment;
         DV = save.dV;
@@ -390,8 +407,12 @@ public class ShipForSimulation
         ShipName = save.shipName;
         IsInJourney = save.isInJourney;
         IsLastDestination = save.isLastDestination;
-
-        for(int i = 0; i < save.idDestinations.Count; i++)
+        Route = Corporate.ShipDepartment.GetRoute(save.routeId);
+        StartBreakingDay = save.startBreakingDay;
+        BreakBetweenJourneys = save.breakBetweenJourneys;
+        IsDocking = save.isDocking;
+        Debug.Log($"Привет, я загружен, меня зовут корабль {ShipName}, я тип {TypeShip}, и принадлежу корпорации {Corporate.CorpName}");
+        for (int i = 0; i < save.idDestinations.Count; i++)
         {
             SetDestination(MainClass.Asteroids.GetSimAsteroid(save.idDestinations[i]));
         }

@@ -17,11 +17,9 @@ public class ShipDepartment
     }
     public void CreateShip(int type, int typeCarcass, int typeFuelTank, int typeEngine)
     {
-        ships.Add(new ShipForSimulation());
+        ships.Add(new ShipForSimulation(Corporate.MainClass, Corporate));
         int id = ships.Count - 1;
-        ships[id].Corporate = Corporate;
         ships[id].ISP = Corporate.ScienseDepartment.GetEngine(typeEngine).Isp;
-        ships[id].MainClass = Corporate.MainClass;
         ships[id].MaxWeightPlayload = Corporate.ScienseDepartment.GetCarcass(typeCarcass).MaxWeightPlayload;
         ships[id].ShipName = "";
         ships[id].TypeFuel = Corporate.ScienseDepartment.GetEngine(typeEngine).TypeFuel;
@@ -29,7 +27,6 @@ public class ShipDepartment
         ships[id].Weight = Corporate.ScienseDepartment.GetCarcass(typeCarcass).Weight + Corporate.ScienseDepartment.GetFuelTank(typeFuelTank).Weight + Corporate.ScienseDepartment.GetEngine(typeEngine).Weight;
         ships[id].WeightFuel = Corporate.ScienseDepartment.GetFuelTank(typeFuelTank).MaxFuel;
         ships[id].Id = id;
-        ships[id].MainClass = Corporate.MainClass;
         
         Corporate.PlusEngine(typeEngine, -1);
         Corporate.PlusFuelTank(typeFuelTank, -1);
@@ -108,7 +105,7 @@ public class ShipDepartment
         {
             if (!asteroids[i].IsInRoute)
             {
-                routes.Add(new Route());
+                routes.Add(new Route(Corporate.MainClass));
                 routes[routes.Count - 1].SetDestination(asteroids[i]);
                 routes[routes.Count - 1].NameRoute = $"{i}";
                 asteroids[i].IsInRoute = true;
@@ -150,8 +147,26 @@ public class ShipDepartment
 
     public void CreateEmptyShip(SaveLoadShipSim save)
     {
-        ships.Add(new ShipForSimulation());
-        ships[ships.Count - 1].MainClass = Corporate.MainClass;
+        ships.Add(new ShipForSimulation(Corporate.MainClass, Corporate));
         ships[ships.Count - 1].LoadData(save);
+        Debug.Log($"У корпорации {Corporate.CorpName} теперь {ships.Count} кораблей, а если через shipdepartment, то {Corporate.ShipDepartment.CountShips()}");
+    }
+
+    public Route GetRoute(int id)
+    {
+        return routes[id];
+    }
+
+    public int CountRoutes()
+    {
+        return routes.Count;
+    }
+
+    public void CreateEmptyRoute(int amount)
+    {
+        for(int i = 0; i < amount; i++)
+        {
+            routes.Add(new Route(Corporate.MainClass));
+        }        
     }
 }

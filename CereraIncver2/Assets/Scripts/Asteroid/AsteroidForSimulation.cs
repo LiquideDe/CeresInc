@@ -92,6 +92,7 @@ public class AsteroidForSimulation : Asteroid, IAsteroid
             save.amountReadyForLoading = ReadyToLoad;
             save.workersOnStation = WorkersOnStation;
             save.workersPlanned = WorkersPlanned;
+            save.isInRoute = IsInRoute;
         }
     }
 
@@ -108,6 +109,7 @@ public class AsteroidForSimulation : Asteroid, IAsteroid
             ReadyToLoad = save.amountReadyForLoading;
             WorkersOnStation = save.workersOnStation;
             WorkersPlanned = save.workersPlanned;
+            IsInRoute = save.isInRoute;
         }
     }
 }
