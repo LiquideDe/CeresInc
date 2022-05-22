@@ -13,6 +13,11 @@ public class AccidentAtEarthMaterial : StoryEvent
         EventPanel = evPanel;
 
         IdMaterial = idMaterial;
+        IdType = 3;
+    }
+    public AccidentAtEarthMaterial(EventPanel evPanel)
+    {
+        EventPanel = evPanel;
     }
     public override void EventHappen()
     {
@@ -25,5 +30,15 @@ public class AccidentAtEarthMaterial : StoryEvent
     {
         EventPanel.Main.Materials.GetMaterial(IdMaterial).CoefFromEvent = 1;
         return true;
+    }
+
+    protected override void SaveAnotherData(SaveLoadAccident save)
+    {
+        save.idMaterial = IdMaterial;
+    }
+
+    protected override void LoadAnotherData(SaveLoadAccident save)
+    {
+        IdMaterial = save.idMaterial;
     }
 }

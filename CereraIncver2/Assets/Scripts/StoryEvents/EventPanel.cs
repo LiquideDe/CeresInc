@@ -13,7 +13,7 @@ public class EventPanel : MonoBehaviour, IPointerDownHandler
     [SerializeField] private NewsPanel newsPanel;
     public main Main { get { return mainClass; } }
     public Text TextNews { get { return textNews; } }
-    public bool IsShowNews { get; set; }
+    private bool isShowNews;
 
     public void SetNews(string news)
     {
@@ -94,6 +94,13 @@ public class EventPanel : MonoBehaviour, IPointerDownHandler
                 events.Add(new AccidentAtWarehouse(materialId, 0, strengthOfDown, timeStart, this));
                 break;
 
+            case 19:
+                var accident = GenerateMiningStationAccident();
+                if(accident != null)
+                {
+                    events.Add(accident);
+                }
+                break;
             case 20:
                 events.Add(new FindNewMine(materialId, 0, strengthOfDown, timeStart, this));
                 break;
@@ -119,6 +126,22 @@ public class EventPanel : MonoBehaviour, IPointerDownHandler
         }
     }
 
+    private AccidentAtMiningStation GenerateMiningStationAccident()
+    {
+        Inc player = Main.Player;
+        if(player.CountAsteroids() > 0)
+        {
+            int idAster = Main.GenerateRandomInt(0, player.CountAsteroids());
+            int amount = Main.GenerateRandomInt(1 , player.GetAsteroid(idAster).Workers);
+            string text = $"Произошел несчастный случай на добывающей станции {player.GetAsteroid(idAster).AsterName}, погибло {amount} рабочих";
+            AccidentAtMiningStation accidentAtMiningStation = new AccidentAtMiningStation(player.GetAsteroid(idAster).MiningStation, amount, text, 0, 1, (int)Main.CeresTime, this);
+            return accidentAtMiningStation;
+        }
+        else
+        {
+            return null;
+        }
+    }
     public void EventHappen()
     {
 
@@ -152,17 +175,17 @@ public class EventPanel : MonoBehaviour, IPointerDownHandler
     {
         textNews.rectTransform.anchoredPosition = new Vector2(textNews.preferredWidth, 0);
         panel.SetActive(true);
-        IsShowNews = true;
+        isShowNews = true;
     }
 
     private void Update()
     {
-        if (IsShowNews)
+        if (isShowNews)
         {
             textNews.rectTransform.anchoredPosition = Vector2.Lerp(textNews.rectTransform.anchoredPosition, new Vector2(textNews.rectTransform.anchoredPosition.x - 20f, 0), Time.deltaTime * 10f);
             if(textNews.rectTransform.anchoredPosition.x < -100)
             {
-                IsShowNews=false;
+                isShowNews = false;
                 panel.SetActive(false);
                 TextNews.text = "";
             }
@@ -174,7 +197,7 @@ public class EventPanel : MonoBehaviour, IPointerDownHandler
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             newsPanel.gameObject.SetActive(true);
-            IsShowNews = false;
+            isShowNews = false;
             panel.SetActive(false);
 
         }
@@ -182,7 +205,57 @@ public class EventPanel : MonoBehaviour, IPointerDownHandler
         if (Input.GetKeyDown(KeyCode.Mouse1))
         {
             panel.SetActive(false);
-            IsShowNews = false;
+            isShowNews = false;
+        }
+    }
+    public StoryEvent GetEvent(int id)
+    {
+        return events[id];
+    }
+
+    public int CountEvents()
+    {
+        return events.Count;
+    }
+
+    public void SaveData(SaveLoadEvent save)
+    {
+        for(int i = 0; i < events.Count; i++)
+        {
+            save.accidents.Add(events[i].IdType);
+        }
+    }
+
+    public void LoadData(SaveLoadEvent save)
+    {
+        for(int i = 0; i < save.accidents.Count; i++)
+        {
+            AddNewAccident(save.accidents[i]);
+        }
+    }
+
+    private void AddNewAccident(int id)
+    {
+        switch (id)
+        {
+            case 0:
+                events.Add(new FindNewMine(this));
+                break;
+            case 1:
+                events.Add(new CloseMine(this));
+                break;
+            case 2:
+                events.Add(new AccidentAtEarthBuilding(this));
+                break;
+            case 3:
+                events.Add(new AccidentAtEarthMaterial(this));
+                break;
+            case 4:
+                events.Add(new AccidentAtMiningStation(this));
+                break;
+            case 5:
+                events.Add(new AccidentAtWarehouse(this));
+                break;
         }
     }
 }

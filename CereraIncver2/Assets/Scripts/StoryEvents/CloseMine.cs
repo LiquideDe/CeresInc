@@ -14,6 +14,12 @@ public class CloseMine : StoryEvent
         EventPanel = evPanel;
 
         IdMaterial = idMaterial;
+        IdType = 1;
+    }
+
+    public CloseMine(EventPanel evPanel)
+    {
+        EventPanel = evPanel;
     }
     public override void EventHappen()
     {
@@ -26,5 +32,15 @@ public class CloseMine : StoryEvent
     protected override bool ReturnToNormal()
     {
         return true;
+    }
+
+    protected override void SaveAnotherData(SaveLoadAccident save)
+    {
+        save.idMaterial = IdMaterial;
+    }
+
+    protected override void LoadAnotherData(SaveLoadAccident save)
+    {
+        IdMaterial = save.idMaterial;
     }
 }

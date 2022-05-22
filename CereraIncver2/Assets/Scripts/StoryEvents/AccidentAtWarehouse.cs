@@ -13,8 +13,12 @@ public class AccidentAtWarehouse : StoryEvent
         DurationTime = durTime;
         ImpactFactor = impFact;
         DayOfStart = dayStart;
-        EventPanel = evPanel;       
-        
+        EventPanel = evPanel;
+        IdType = 5;
+    }
+    public AccidentAtWarehouse(EventPanel evPanel)
+    {
+        EventPanel = evPanel;
     }
 
     public override void EventHappen()
@@ -40,5 +44,17 @@ public class AccidentAtWarehouse : StoryEvent
     protected override bool ReturnToNormal()
     {
         return true;
+    }
+
+    protected override void SaveAnotherData(SaveLoadAccident save)
+    {
+        save.idMaterial = IdMaterial;
+        save.amountRes = AmountRes;
+    }
+
+    protected override void LoadAnotherData(SaveLoadAccident save)
+    {
+        IdMaterial = save.idMaterial;
+        AmountRes = save.amountRes;
     }
 }

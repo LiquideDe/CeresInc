@@ -14,6 +14,7 @@ public class SpaceCorp : EarthCorp, ICorporateConsumption
         Money = 1000000000;
         AmountShare = 10000;
         ProductionFactor = 1;
+        IdType = 4;
     }
 
     public void StartGame(bool isNewGame)
@@ -23,6 +24,7 @@ public class SpaceCorp : EarthCorp, ICorporateConsumption
         if (isNewGame)
         {
             buildings.Add(new BigSpaceFactory(this, true));
+            buildings[0].IndexInList = 0;
         }
     }
     protected override void InfrastructureDevelopment()
@@ -57,6 +59,7 @@ public class SpaceCorp : EarthCorp, ICorporateConsumption
                 break;
 
         }
+        SetId();
     }
     protected override int GetIdCorp()
     {

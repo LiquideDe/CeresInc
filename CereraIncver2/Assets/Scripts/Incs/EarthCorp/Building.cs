@@ -21,6 +21,7 @@ public abstract class Building
     public float SpentMoney { get; set; }
     public float CoefFromEvent { get; set; }
     public int IndexInTemplate { get; set; }
+    public int IndexInList { get; set; }
 
     protected void Ñonstruction(int dayNow)
     {
@@ -185,6 +186,7 @@ public abstract class Building
         save.efficiency = Efficiency;
         save.coefFromEvent = CoefFromEvent;
         save.maxOutput = MaxOutput;
+        save.indexInList = IndexInList;
     }
 
     public void LoadData(SaveLoadBuilding save)
@@ -198,5 +200,6 @@ public abstract class Building
         Efficiency = save.efficiency;
         CoefFromEvent = save.coefFromEvent;
         MaxOutput = save.maxOutput;
+        IndexInList = save.indexInList;
     }
 }

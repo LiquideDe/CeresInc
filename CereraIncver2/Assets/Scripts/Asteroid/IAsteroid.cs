@@ -16,5 +16,8 @@ public interface IAsteroid
     public string AsterName { get; }
     public int Id { get; }
     public Vector3 Position { get; }
-
+    public void EmbedAgent();
+    public void Sabotage(int amount);
+    public bool IsAgentEmbedded { get; set; }
+    
 }

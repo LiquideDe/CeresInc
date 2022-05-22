@@ -110,4 +110,15 @@ public class AsteroidForPlayer : Asteroid, IAsteroid
             MiningStation.WorkersPlanned = save.workersPlanned;
         }
     }
+
+    public void EmbedAgent()
+    {
+        IsAgentEmbedded = true;
+    }
+
+    public void Sabotage(int amount)
+    {
+        MiningStation.WorkersOnStation -= amount;
+
+    }
 }

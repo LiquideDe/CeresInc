@@ -13,6 +13,7 @@ public class HeavyCorp : EarthCorp, ICorporateConsumption
         Money = 10000000;
         AmountShare = 10000;
         ProductionFactor = 1;
+        IdType = 1;
     }
 
     protected override void InfrastructureDevelopment()
@@ -46,6 +47,7 @@ public class HeavyCorp : EarthCorp, ICorporateConsumption
                 break;
             
         }
+        SetId();
     }
 
     public void StartGame(bool isNewGame)
@@ -56,6 +58,7 @@ public class HeavyCorp : EarthCorp, ICorporateConsumption
         if (isNewGame)
         {
             buildings.Add(new BigHeavyFactory(this, true));
+            buildings[0].IndexInList = 0;
         }
     }
 

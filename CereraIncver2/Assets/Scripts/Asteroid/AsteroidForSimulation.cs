@@ -112,4 +112,14 @@ public class AsteroidForSimulation : Asteroid, IAsteroid
             IsInRoute = save.isInRoute;
         }
     }
+
+    public void EmbedAgent()
+    {
+        IsAgentEmbedded = true;
+    }
+
+    public void Sabotage(int amount)
+    {
+        WorkersOnStation -= amount;
+    }
 }

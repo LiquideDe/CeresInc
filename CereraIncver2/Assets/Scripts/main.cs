@@ -12,7 +12,7 @@ public class main : MonoBehaviour
     [SerializeField] private Text moneyText;
     [SerializeField] private InputField gameName;
     [SerializeField] private Button buttonX1, buttonX2, buttonX3, buttonPause;
-    [SerializeField] private GameObject mainLogo;
+    [SerializeField] private GameObject mainLogo, speedPanel;
 
     private Button prevBut, prevButBeforePause;
     public GameObject HelloPanel { get { return helloPanel; } }
@@ -82,6 +82,11 @@ public class main : MonoBehaviour
         prevBut = buttonPause;
         prevButBeforePause = buttonX1;
         incs.Add(new Inc("player", 1000000));
+
+        if (GlobalForLoad.IsFromOldGame)
+        {
+            GUI.LoadGame(GlobalForLoad.Path);
+        }
     }
 
     public void CreateNewGame(int id=0)
@@ -155,6 +160,7 @@ public class main : MonoBehaviour
     {
         GameIsStarted = true;
         mainLogo.SetActive(false);
+        speedPanel.SetActive(true);
     }
 
     // Update is called once per frame
@@ -295,5 +301,10 @@ public class main : MonoBehaviour
     public void StopTypingInInputField()
     {
         isInputField = false;
+    }
+
+    public void Exit()
+    {
+        Application.Quit();
     }
 }

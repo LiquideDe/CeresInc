@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LoadGame : MonoBehaviour
 {
@@ -51,9 +52,19 @@ public class LoadGame : MonoBehaviour
             }
         }
         else
-        {            
+        {
             //mainClass.incs.Add(new Inc("player", 1000000));
-            mainClass.GUI.LoadGame(dirName);
+            if (mainClass.GameIsStarted)
+            {
+                GlobalForLoad.IsFromOldGame = true;
+                GlobalForLoad.Path = dirName;
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            }
+            else
+            {
+                mainClass.GUI.LoadGame(dirName);
+            }
+            
         }
     }
 
@@ -207,7 +218,7 @@ public class LoadGame : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         Debug.Log($"8 - загружаем добывающие компании, row = {row}");
-        StartCoroutine(mainClass.Corporates.CreateCorporates(false));
+        yield return StartCoroutine(mainClass.Corporates.CreateCorporates(false));
         int[] amountShipsAtMiningCorp = new int[mainClass.Corporates.CountMiningCorp()];
         for (int i = 0; i < mainClass.Corporates.CountMiningCorp(); i++)
         {
@@ -423,15 +434,38 @@ public class LoadGame : MonoBehaviour
             SaveLoadStationModule loadStationModule = JsonUtility.FromJson<SaveLoadStationModule>(data[row + i]);
             mainClass.Ceres.GetSpaceModule(i).LoadData(loadStationModule);
         }
-        yield return StartCoroutine(LoadAnothers());
+        row += mainClass.Ceres.CountModules();
+        yield return StartCoroutine(LoadEventPanel(loadmain, row, data));
     }
 
-    private IEnumerator LoadAnothers()
+    private IEnumerator LoadEventPanel(SaveLoadmain loadmain, int row, string[] data)
     {
         yield return new WaitForEndOfFrame();
+        SaveLoadEvent loadEvent = JsonUtility.FromJson<SaveLoadEvent>(data[row]);
+        mainClass.EventPanel.LoadData(loadEvent);
+        row += 1;
+        yield return StartCoroutine(LoadAccidents(loadmain, row, data));
+    }
+
+    private IEnumerator LoadAccidents(SaveLoadmain loadmain, int row, string[] data)
+    {
+        yield return new WaitForEndOfFrame();
+        for(int i = 0; i < mainClass.EventPanel.CountEvents(); i++)
+        {
+            SaveLoadAccident loadAccident = JsonUtility.FromJson<SaveLoadAccident>(data[row + i]);
+            mainClass.EventPanel.GetEvent(i).LoadData(loadAccident);            
+        }
+        row += mainClass.EventPanel.CountEvents();
+        yield return StartCoroutine(LoadAnothers());
+    }
+    private IEnumerator LoadAnothers()
+    {
+        
+        yield return new WaitForEndOfFrame();
+        Debug.Log($"Загружаем остальное");
         panelLoadGame.SetActive(false);
         mainClass.CreatePanels();
-        mainClass.PanelStation.CreateButtons();
+        yield return StartCoroutine(mainClass.PanelStation.CreateButtons());
         mainClass.HelloPanel.SetActive(false);
         mainClass.GameIsStarted = true;
         yield return new WaitForEndOfFrame();

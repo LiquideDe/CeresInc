@@ -13,6 +13,7 @@ public abstract class EarthCorp: ICorporateShare
     public float IncomeMoney { get; set; }
     public float OutlayMoney { get; set; }
     public float ProductionFactor { get; set; }
+    public int IdType { get; set; }
     protected List<float> materialsConsuption;
     protected List<float> materialsCoefConsuption;
     protected List<float> totalConsumption = new List<float>();
@@ -235,6 +236,11 @@ public abstract class EarthCorp: ICorporateShare
     public IBuilding GetBuilding(int id)
     {
         return buildings[id];
+    }
+
+    protected void SetId()
+    {
+        buildings[buildings.Count - 1].IndexInList = buildings.Count - 1;
     }
 
     public void SaveData(SaveLoadEarthCorp save)

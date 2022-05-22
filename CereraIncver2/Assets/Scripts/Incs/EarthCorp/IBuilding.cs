@@ -15,5 +15,5 @@ public interface IBuilding
     public float GetSpentMoney();
 
     public Building GetCleanBuilding();
-
+    public int IndexInList { get; set; }
 }

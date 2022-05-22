@@ -13,6 +13,7 @@ public class LightCorp : EarthCorp, ICorporateConsumption
         Money = 10000000;
         AmountShare = 10000;
         ProductionFactor = 1;
+        IdType = 2;
     }
     protected override void InfrastructureDevelopment()
     {
@@ -45,6 +46,7 @@ public class LightCorp : EarthCorp, ICorporateConsumption
                 break;
 
         }
+        SetId();
     }
 
     public void StartGame(bool isNewGame)
@@ -55,6 +57,7 @@ public class LightCorp : EarthCorp, ICorporateConsumption
         if (isNewGame)
         {
             buildings.Add(new BigLightFactory(this, true));
+            buildings[0].IndexInList = 0;
         }
     }
 

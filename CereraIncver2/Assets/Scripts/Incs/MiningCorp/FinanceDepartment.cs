@@ -19,9 +19,9 @@ public class FinanceDepartment
         float sum = 0;
         for(int i=0;i< corporate.MiningDepartment.CountAsteroids(); i++)
         {
-            sum += corporate.MiningDepartment.GetAsteroid(i).ElementCapacity;
+            sum += corporate.MiningDepartment.GetAsteroid(i).IncomeLastMonth;
         }
-        PriceShare = (corporate.Money + sum * corporate.OrientRes.Price/5 + corporate.AmountResource * corporate.OrientRes.Price + corporate.ShipDepartment.CountShips() * 1000)/10000;
+        PriceShare = (corporate.Money + sum * corporate.OrientRes.Price/5 + corporate.ShipDepartment.CountShips() * 1000)/10000;
         DecisionBuyOrSellShare();
     }
 

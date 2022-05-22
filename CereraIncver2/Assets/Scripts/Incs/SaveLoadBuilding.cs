@@ -8,7 +8,7 @@ public class SaveLoadBuilding
     public List<float> materialsCoefConsuption;
     public List<float> materialsNeedToConstruction;
 
-    public int idEarthCorp, daysForConstruct, startDayConstruction, finishDayConstruction, maxDaysWorking, indexInTemplate;
+    public int idEarthCorp, daysForConstruct, startDayConstruction, finishDayConstruction, maxDaysWorking, indexInTemplate, indexInList;
     public bool isConstructed, isMaterialEnough;
     public float efficiency, coefFromEvent, maxOutput;
         

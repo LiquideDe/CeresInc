@@ -14,6 +14,7 @@ public abstract class Asteroid : MonoBehaviour
     public int Id { get; set; }
     public Vector3 Position { get; set; }
     public bool HasMiningStation { get; set; }
+    public bool IsAgentEmbedded { get; set; }
 
     public void SaveData(SaveLoadAsteroid save)
     {

@@ -16,6 +16,11 @@ public class AccidentAtEarthBuilding : StoryEvent
 
         EarthCorp = corp;
         Building = build;
+        IdType = 2;
+    }
+    public AccidentAtEarthBuilding(EventPanel evPanel)
+    {
+        EventPanel = evPanel;
     }
     public override void EventHappen()
     {
@@ -28,5 +33,17 @@ public class AccidentAtEarthBuilding : StoryEvent
     {
         Building.CoefFromEvent = 1;
         return true;
+    }
+
+    protected override void SaveAnotherData(SaveLoadAccident save)
+    {
+        save.idEarthCorp = EarthCorp.IdType;
+        save.idBuilding = Building.IndexInList;
+    }
+
+    protected override void LoadAnotherData(SaveLoadAccident save)
+    {
+        EarthCorp = EventPanel.Main.Earth.GetEarthCorp(save.idEarthCorp);
+        Building = EventPanel.Main.Earth.GetEarthCorp(save.idEarthCorp).GetBuilding(save.idBuilding);
     }
 }

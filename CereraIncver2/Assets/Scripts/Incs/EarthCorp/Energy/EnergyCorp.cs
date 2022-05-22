@@ -13,6 +13,7 @@ public class EnergyCorp : EarthCorp, ICorporateConsumption
         Money = 100000000;
         AmountShare = 10000;
         ProductionFactor = 1;
+        IdType = 0;
     }
 
     public void StartGame(bool isNewGame)
@@ -22,6 +23,7 @@ public class EnergyCorp : EarthCorp, ICorporateConsumption
         if (isNewGame)
         {
             buildings.Add(new SolarBuild(this, true));
+            buildings[0].IndexInList = 0;
         }
     }
 
@@ -58,7 +60,7 @@ public class EnergyCorp : EarthCorp, ICorporateConsumption
         switch (id)
         {
             case 0:
-                buildings.Add(new SolarBuild(this));
+                buildings.Add(new SolarBuild(this));                
                 break;
             case 1:
                 buildings.Add(new OilPowerPlant(this));
@@ -67,6 +69,7 @@ public class EnergyCorp : EarthCorp, ICorporateConsumption
                 buildings.Add(new UraniumAtomic(this));
                 break;
         }
+        SetId();
     }
 
     protected override int GetIdCorp()

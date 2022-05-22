@@ -13,6 +13,7 @@ public class MiningStationButton : MonoBehaviour, IPointerDownHandler, IPointerU
     
     public void OnPointerDown(PointerEventData eventData)
     {
+        Debug.Log($"Делаем тыщ, корпорация = {Corp.CorpName}");
         List<IAsteroid> list = new List<IAsteroid>();
         if (Corp == null)
         {
@@ -31,4 +32,6 @@ public class MiningStationButton : MonoBehaviour, IPointerDownHandler, IPointerU
     {
         
     }
+
+    
 }

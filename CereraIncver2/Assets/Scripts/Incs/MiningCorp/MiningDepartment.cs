@@ -49,7 +49,7 @@ public class MiningDepartment
     }
 
     public List<AsteroidForSimulation> GetAllAsteroids()
-    {
+    {        
         return asteroids;
     }
 }

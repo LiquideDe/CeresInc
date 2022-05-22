@@ -14,6 +14,12 @@ public class FindNewMine : StoryEvent
         EventPanel = evPanel;
 
         IdMaterial = idMaterial;
+        IdType = 0;
+    }
+
+    public FindNewMine(EventPanel evPanel)
+    {
+        EventPanel = evPanel;
     }
     public override void EventHappen()
     {
@@ -25,5 +31,15 @@ public class FindNewMine : StoryEvent
     protected override bool ReturnToNormal()
     {
         return true;
+    }
+
+    protected override void SaveAnotherData(SaveLoadAccident save)
+    {
+        save.idMaterial = IdMaterial;
+    }
+
+    protected override void LoadAnotherData(SaveLoadAccident save)
+    {
+        IdMaterial = save.idMaterial;
     }
 }

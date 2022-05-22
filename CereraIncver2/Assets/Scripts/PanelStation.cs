@@ -27,8 +27,12 @@ public class PanelStation : Spisok
         item.textIncome.text = $"Добывает в день \n {asteroids[id].IncomeLastMonth}";
         item.textExcavated.text = $"Всего добыто \n {asteroids[id].ExcavatedSoil}";
         item.textReady.text = $"Готово к отправке \n {asteroids[id].AmountReadyForLoading}";
-        item.textAmount.text = $"Всего осталось ресурса \n {asteroids[id].ElementCapacity}";
 
+        if (asteroids[id].IsAgentEmbedded)
+        {
+            item.buttonEmbedAgent.SetActive(false);
+            item.buttonSabotage.SetActive(true);
+        }
         buttons.Add(clone);
     }
 
@@ -43,7 +47,6 @@ public class PanelStation : Spisok
             item.textIncome.text = $"Добыто за прошлый месяц \n {asteroids[i].IncomeLastMonth}";
             item.textExcavated.text = $"Всего добыто \n {asteroids[i].ExcavatedSoil}";
             item.textReady.text = $"Готово к отправке \n {asteroids[i].AmountReadyForLoading}";
-            item.textAmount.text = $"Всего осталось ресурса \n {asteroids[i].ElementCapacity}";
         }
     }
 
@@ -64,6 +67,7 @@ public class PanelStation : Spisok
 
     public void BuildStationList(List<IAsteroid> asteroids)
     {
+        Debug.Log($"строим кнопки, размер массива {asteroids.Count}");
         this.asteroids = new List<IAsteroid>(asteroids);
         if(buttons.Count > 0)
         {
@@ -79,6 +83,7 @@ public class PanelStation : Spisok
 
     public IEnumerator CreateButtons()
     {
+        Debug.Log($"Создаем кнопки корпорации, всего их {mainClass.Corporates.CountMiningCorp()}");
         BuildMiningCorpButtons("Player.Inc", null);
         for(int i = 0; i < mainClass.Corporates.CountMiningCorp(); i++)
         {
@@ -95,5 +100,30 @@ public class PanelStation : Spisok
         stationButton.NameBut.text = $"{name}";
         stationButton.Corp = corp;
         miningCorpStations.Add(gameObject);
+    }
+
+    public void EmbedAgent(int id)
+    {
+        asteroids[FindAsteroid(id)].EmbedAgent();
+        mainClass.Player.Money -= 100000;
+    }
+
+    public void Sabotage(int id)
+    {
+        asteroids[FindAsteroid(id)].Sabotage(mainClass.GenerateRandomInt(0, asteroids[FindAsteroid(id)].Workers - 1));
+        mainClass.Player.Money -= 10000;
+    }
+
+    private int FindAsteroid(int id)
+    {
+        for(int i = 0; i < asteroids.Count; i++)
+        {
+            if (asteroids[i].Id == id)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }

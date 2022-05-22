@@ -334,6 +334,21 @@ public class SaveGame : Spisok
 
             data.Add(JsonUtility.ToJson(saveLoadStationModules[i]));
         }
+
+        //21 - сохраняем список ивентов
+        SaveLoadEvent saveLoadEvent = new SaveLoadEvent();
+        mainClass.EventPanel.SaveData(saveLoadEvent);
+        data.Add(JsonUtility.ToJson(saveLoadEvent));
+
+        //22 - сохраняем ивенты
+        List<SaveLoadAccident> saveLoadAccidents = new List<SaveLoadAccident>();
+        for(int i = 0; i < mainClass.EventPanel.CountEvents(); i++)
+        {
+            saveLoadAccidents.Add(new SaveLoadAccident());
+            mainClass.EventPanel.GetEvent(i).SaveData(saveLoadAccidents[i]);
+
+            data.Add(JsonUtility.ToJson(saveLoadAccidents[i]));
+        }
         File.WriteAllLines(path, data);
 
     }
