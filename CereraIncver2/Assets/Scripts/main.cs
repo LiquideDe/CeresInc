@@ -154,13 +154,13 @@ public class main : MonoBehaviour
         resPanel.UpdateText(5, $"{Ceres.FreeEnergy}");
 
         panelWithElements.CreateList();
+        speedPanel.SetActive(true);
     }
 
     public void PreStartIsDone()
     {
         GameIsStarted = true;
-        mainLogo.SetActive(false);
-        speedPanel.SetActive(true);
+        mainLogo.SetActive(false);        
     }
 
     // Update is called once per frame

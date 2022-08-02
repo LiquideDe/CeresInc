@@ -26,8 +26,8 @@ public class GUI : MonoBehaviour
     {
        if(!mainClass.IsPaused)
         {
-            //timeAndDate.text = $"{DateTime.AddDays(mainClass.CeresTime).ToString("dd.MM.yyyy")}";
-            timeAndDate.text = $"{(int)mainClass.CeresTime}";
+            timeAndDate.text = $"{DateTime.AddDays(mainClass.CeresTime).ToString("dd.MM.yyyy")}";
+            //timeAndDate.text = $"{(int)mainClass.CeresTime}";
         }
 
        if(mainClass.GameIsStarted && Input.GetKeyDown(KeyCode.Escape))

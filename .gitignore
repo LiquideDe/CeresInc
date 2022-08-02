@@ -12,6 +12,7 @@
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 [Aa]ssets/**/*.meta
+[Aa]ssets/SaveGames/*
 
 # Uncomment this line if you wish to ignore the asset store tools plugin
 [Aa]ssets/AssetStoreTools*
@@ -62,11 +63,9 @@ crashlytics-build.properties
 *.blend
 *.blend1
 *.meta
-
+*.png
 *.fbx
 *.prefab
 *.db
-[Aa]ssets/SaveGames*
-*.png
 *.mat
 *.tga
